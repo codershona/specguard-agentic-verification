@@ -1,0 +1,15 @@
+=== CASE 03 BASELINE EVALUATOR ===
+
+Developer tests:
+Passed: 2/2
+Pass rate: 100%
+
+Independent evaluator:
+Passed: 6/9
+Failed: 3/9
+Pass rate: 66.7%
+
+Observed failures:
+- Domain part does not require a dot.
+- Spaces are not rejected.
+- Non-ASCII characters are not rejected.

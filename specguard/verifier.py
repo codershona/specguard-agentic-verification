@@ -514,7 +514,11 @@ def _repair_required_probes(
         (
             "INVALID_PASSWORD"
             if "password" in description
-            else "INVALID_USERNAME"
+            else (
+                "INVALID_EMAIL"
+                if "email" in description
+                else "INVALID_USERNAME"
+            )
         ),
     )
 
@@ -638,7 +642,8 @@ def _repair_required_probes(
 
     # Return VALID when all password requirements pass.
     if (
-        "return valid" in description
+        "password" in description
+        and "return valid" in description
         and "all requirements" in description
     ):
         return [
@@ -654,7 +659,8 @@ def _repair_required_probes(
 
     # Return INVALID_PASSWORD when any requirement fails.
     if (
-        "return invalid_" in description
+        "password" in description
+        and "return invalid_" in description
         and "any requirement" in description
     ):
         return [
@@ -668,6 +674,148 @@ def _repair_required_probes(
             },
             {
                 "input": "Pass word1!",
+                "expected": invalid_result,
+            },
+        ]
+    
+    # -------------------------------------------------
+    # CASE 03: EMAIL VALIDATION
+    # -------------------------------------------------
+
+    # Exactly one @ character.
+    if (
+        "email" in description
+        and "exactly one @" in description
+    ):
+        return [
+            {
+                "input": "user@example.com",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "userexample.com",
+                "expected": invalid_result,
+            },
+            {
+                "input": "user@@example.com",
+                "expected": invalid_result,
+            },
+        ]
+
+    # At least one character before @.
+    if (
+        "email" in description
+        and "before @" in description
+    ):
+        return [
+            {
+                "input": "user@example.com",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "@example.com",
+                "expected": invalid_result,
+            },
+        ]
+
+    # At least one character after @.
+    if (
+        "email" in description
+        and "after @" in description
+    ):
+        return [
+            {
+                "input": "user@example.com",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "user@",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Domain must contain a dot.
+    if (
+        "domain" in description
+        and "dot" in description
+    ):
+        return [
+            {
+                "input": "user@example.com",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "user@example",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Email must not contain spaces.
+    if (
+        "email" in description
+        and "not contain spaces" in description
+    ):
+        return [
+            {
+                "input": "user@example.com",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "user @example.com",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Email must contain only ASCII characters.
+    if (
+        "email" in description
+        and "ascii" in description
+    ):
+        return [
+            {
+                "input": "user@example.com",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "usér@example.com",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Return VALID when all email requirements pass.
+    if (
+        "email" in description
+        and "return valid" in description
+        and "all requirements" in description
+    ):
+        return [
+            {
+                "input": "user@example.com",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "hello@test.org",
+                "expected": VALID_RESULT,
+            },
+        ]
+
+    # Return INVALID_EMAIL when any email requirement fails.
+    if (
+        "email" in description
+        and "return invalid_" in description
+        and "any requirement" in description
+    ):
+        return [
+            {
+                "input": "user@example",
+                "expected": invalid_result,
+            },
+            {
+                "input": "user @example.com",
+                "expected": invalid_result,
+            },
+            {
+                "input": "usér@example.com",
                 "expected": invalid_result,
             },
         ]
