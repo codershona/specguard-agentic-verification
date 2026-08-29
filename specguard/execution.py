@@ -103,6 +103,7 @@ def execute_verification_results(
 
         confirmed_violation = any(
             not probe["matched"]
+            and probe["error"] is None
             for probe in probe_results
         )
 

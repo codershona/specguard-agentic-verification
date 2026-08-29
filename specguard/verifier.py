@@ -339,6 +339,8 @@ def _validate_verification_response(
             expected == VALID_RESULT
             or expected == "AVAILABLE"
             or expected == "UNAVAILABLE"
+            or expected == "APPROVED"
+            or expected == "DECLINED"
             or expected.startswith(
                 INVALID_RESULT_PREFIX
             )
@@ -347,14 +349,13 @@ def _validate_verification_response(
                 f"Probe {index} has invalid expected "
                 f"value {expected!r}. "
                 "Expected must be VALID, AVAILABLE, "
-                "UNAVAILABLE, or start with INVALID_."
+                "UNAVAILABLE, APPROVED, DECLINED, "
+                "or start with INVALID_."
             )
-
         signature = (
-            repr(test_input),
-            expected,
-        )
-
+             repr(test_input),
+        expected,
+    )
         if signature in seen:
             continue
 
@@ -751,6 +752,150 @@ def _repair_required_probes(
             {
                 "input": "Pass word1!",
                 "expected": invalid_result,
+            },
+        ]
+    # -------------------------------------------------
+    # CASE 08: TRANSFER VALIDATION
+    # -------------------------------------------------
+
+    if (
+        "transfer amount must be a number" in description
+    ):
+        return [
+            {
+                "input": {"amount": 50, "balance": 100},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": "50", "balance": 100},
+                "expected": "INVALID_TRANSFER",
+            },
+        ]
+
+    if (
+        "transfer amount must be greater than 0" in description
+    ):
+        return [
+            {
+                "input": {"amount": 1, "balance": 100},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 0, "balance": 100},
+                "expected": "INVALID_TRANSFER",
+            },
+            {
+                "input": {"amount": -1, "balance": 100},
+                "expected": "INVALID_TRANSFER",
+            },
+        ]
+
+    if (
+        "account balance must be a number" in description
+    ):
+        return [
+            {
+                "input": {"amount": 50, "balance": 100},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 50, "balance": "100"},
+                "expected": "INVALID_TRANSFER",
+            },
+        ]
+
+    if (
+        "account balance must be at least 0" in description
+    ):
+        return [
+            {
+                "input": {"amount": 1, "balance": 1},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 1, "balance": -1},
+                "expected": "INVALID_TRANSFER",
+            },
+        ]
+
+    if (
+        "must not exceed the account balance" in description
+    ):
+        return [
+            {
+                "input": {"amount": 100, "balance": 100},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 101, "balance": 100},
+                "expected": "DECLINED",
+            },
+        ]
+
+    if (
+        "boolean values must not be accepted" in description
+    ):
+        return [
+            {
+                "input": {"amount": True, "balance": 100},
+                "expected": "INVALID_TRANSFER",
+            },
+            {
+                "input": {"amount": 50, "balance": True},
+                "expected": "INVALID_TRANSFER",
+            },
+            {
+                "input": {"amount": 50, "balance": 100},
+                "expected": "APPROVED",
+            },
+        ]
+
+    if (
+        "return approved" in description
+        and "all requirements are satisfied" in description
+    ):
+        return [
+            {
+                "input": {"amount": 50, "balance": 100},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 100, "balance": 100},
+                "expected": "APPROVED",
+            },
+        ]
+
+    if (
+        "return declined" in description
+        and "exceeds the account balance" in description
+    ):
+        return [
+            {
+                "input": {"amount": 101, "balance": 100},
+                "expected": "DECLINED",
+            },
+            {
+                "input": {"amount": 100, "balance": 100},
+                "expected": "APPROVED",
+            },
+        ]
+
+    if (
+        "return invalid_transfer" in description
+        and "input validation requirement" in description
+    ):
+        return [
+            {
+                "input": {"amount": 0, "balance": 100},
+                "expected": "INVALID_TRANSFER",
+            },
+            {
+                "input": {"amount": "50", "balance": 100},
+                "expected": "INVALID_TRANSFER",
+            },
+            {
+                "input": {"amount": 50, "balance": -1},
+                "expected": "INVALID_TRANSFER",
             },
         ]
 
