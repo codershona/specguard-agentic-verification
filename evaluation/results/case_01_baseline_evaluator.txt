@@ -1,0 +1,97 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/falguniislam/Documents/specguard-agentic-verification/.venv/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/falguniislam/Documents/specguard-agentic-verification
+collecting ... collected 10 items
+
+evaluation/cases/case_01/evaluator_test.py::test_minimum_length_boundary PASSED [ 10%]
+evaluation/cases/case_01/evaluator_test.py::test_maximum_length_boundary PASSED [ 20%]
+evaluation/cases/case_01/evaluator_test.py::test_exceeds_maximum_length FAILED [ 30%]
+evaluation/cases/case_01/evaluator_test.py::test_cannot_start_with_underscore FAILED [ 40%]
+evaluation/cases/case_01/evaluator_test.py::test_cannot_end_with_underscore FAILED [ 50%]
+evaluation/cases/case_01/evaluator_test.py::test_consecutive_underscores_rejected FAILED [ 60%]
+evaluation/cases/case_01/evaluator_test.py::test_hyphen_rejected FAILED  [ 70%]
+evaluation/cases/case_01/evaluator_test.py::test_space_rejected FAILED   [ 80%]
+evaluation/cases/case_01/evaluator_test.py::test_non_ascii_letters_rejected FAILED [ 90%]
+evaluation/cases/case_01/evaluator_test.py::test_digits_and_single_underscore_allowed PASSED [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_exceeds_maximum_length __________________________
+
+    def test_exceeds_maximum_length():
+>       assert validate_username("abcdefghijklmnopqrstu") == "INVALID_USERNAME"
+E       AssertionError: assert 'VALID' == 'INVALID_USERNAME'
+E         
+E         - INVALID_USERNAME
+E         + VALID
+
+evaluation/cases/case_01/evaluator_test.py:13: AssertionError
+______________________ test_cannot_start_with_underscore _______________________
+
+    def test_cannot_start_with_underscore():
+>       assert validate_username("_falguni") == "INVALID_USERNAME"
+E       AssertionError: assert 'VALID' == 'INVALID_USERNAME'
+E         
+E         - INVALID_USERNAME
+E         + VALID
+
+evaluation/cases/case_01/evaluator_test.py:17: AssertionError
+_______________________ test_cannot_end_with_underscore ________________________
+
+    def test_cannot_end_with_underscore():
+>       assert validate_username("falguni_") == "INVALID_USERNAME"
+E       AssertionError: assert 'VALID' == 'INVALID_USERNAME'
+E         
+E         - INVALID_USERNAME
+E         + VALID
+
+evaluation/cases/case_01/evaluator_test.py:21: AssertionError
+____________________ test_consecutive_underscores_rejected _____________________
+
+    def test_consecutive_underscores_rejected():
+>       assert validate_username("falguni__01") == "INVALID_USERNAME"
+E       AssertionError: assert 'VALID' == 'INVALID_USERNAME'
+E         
+E         - INVALID_USERNAME
+E         + VALID
+
+evaluation/cases/case_01/evaluator_test.py:25: AssertionError
+_____________________________ test_hyphen_rejected _____________________________
+
+    def test_hyphen_rejected():
+>       assert validate_username("falguni-01") == "INVALID_USERNAME"
+E       AssertionError: assert 'VALID' == 'INVALID_USERNAME'
+E         
+E         - INVALID_USERNAME
+E         + VALID
+
+evaluation/cases/case_01/evaluator_test.py:29: AssertionError
+_____________________________ test_space_rejected ______________________________
+
+    def test_space_rejected():
+>       assert validate_username("falguni 01") == "INVALID_USERNAME"
+E       AssertionError: assert 'VALID' == 'INVALID_USERNAME'
+E         
+E         - INVALID_USERNAME
+E         + VALID
+
+evaluation/cases/case_01/evaluator_test.py:33: AssertionError
+_______________________ test_non_ascii_letters_rejected ________________________
+
+    def test_non_ascii_letters_rejected():
+>       assert validate_username("fálguni") == "INVALID_USERNAME"
+E       AssertionError: assert 'VALID' == 'INVALID_USERNAME'
+E         
+E         - INVALID_USERNAME
+E         + VALID
+
+evaluation/cases/case_01/evaluator_test.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED evaluation/cases/case_01/evaluator_test.py::test_exceeds_maximum_length
+FAILED evaluation/cases/case_01/evaluator_test.py::test_cannot_start_with_underscore
+FAILED evaluation/cases/case_01/evaluator_test.py::test_cannot_end_with_underscore
+FAILED evaluation/cases/case_01/evaluator_test.py::test_consecutive_underscores_rejected
+FAILED evaluation/cases/case_01/evaluator_test.py::test_hyphen_rejected - Ass...
+FAILED evaluation/cases/case_01/evaluator_test.py::test_space_rejected - Asse...
+FAILED evaluation/cases/case_01/evaluator_test.py::test_non_ascii_letters_rejected
+========================= 7 failed, 3 passed in 0.02s ==========================
