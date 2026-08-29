@@ -375,3 +375,40 @@ It combines semantic requirement decomposition, agent-generated probes, determin
 The central finding of the benchmark is:
 
 > Passing developer tests does not necessarily demonstrate complete requirement satisfaction.
+## Challenging Case — Case 08: Transfer Validation
+
+Case 08 was a particularly useful stress test because the target function required multiple related inputs: `amount` and `balance`.
+
+Earlier verification attempts exposed a weakness in handling multi-argument probes. Incomplete probe structures could produce execution errors rather than meaningful requirement evidence. This revealed an important distinction: a probe that cannot execute does not prove that the implementation violates a requirement.
+
+The workflow was strengthened to generate complete multi-argument inputs and to separate execution failures from confirmed requirement mismatches.
+
+In the final Case 08 evidence, SpecGuard successfully executed structured probes such as:
+
+```text
+{'amount': 101, 'balance': 100}
+Expected: DECLINED
+Actual: APPROVED
+Matched: False
+```
+
+It also exposed boolean-input behavior:
+
+```text
+{'amount': True, 'balance': 100}
+Expected: INVALID_TRANSFER
+Actual: APPROVED
+Matched: False
+```
+
+The final evaluation identified the two intended unique defect dimensions in this case:
+
+- transfers exceeding the available balance were incorrectly approved
+- boolean values were incorrectly accepted as numeric transfer inputs
+
+This case directly influenced SpecGuard's execution semantics: execution errors are not treated as confirmed violations, and when no usable execution evidence exists the result becomes `inconclusive`.
+
+Evidence:
+
+- `trajectories/iteration_10_case_08_final_evidence.txt`
+- `trajectories/iteration_13_execution_inconclusive_evidence.txt`
