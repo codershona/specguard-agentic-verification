@@ -100,3 +100,87 @@ Requirement 3 is now decomposed into:
 - Username must not end with an underscore.
 
 All unit tests pass: 3/3.
+
+
+## Iteration 3 - Verification Agent, Probe Critic, and Execution-Grounded Verdicts
+
+### Goal
+
+Verify atomic acceptance criteria against implementation code using generated probes, deterministic validation, and executable evidence.
+
+### Changes
+
+- Added a Verification Agent that generates multiple probes for each acceptance criterion.
+- Added structured JSON validation for verifier responses.
+- Added retry feedback when model output is malformed or incomplete.
+- Added a deterministic probe critic to reject probes that do not directly test the target criterion.
+- Added deterministic repair for mandatory boundary and adversarial probes.
+- Added execution of generated probes directly against the target implementation.
+- Added `confirmed_violation` based on actual probe mismatches.
+- Added `final_verdict`, where executable evidence overrides the agent's self-reported verdict.
+- Added unit tests for verifier and execution behavior.
+- Added trajectory evidence files for initial verification, execution evidence, targeted probes, repaired probes, and final verdict behavior.
+
+### Failures observed
+
+- The agent initially generated probes that did not isolate the acceptance criterion.
+- Numeric boundary verification missed the 20/21 character upper boundary.
+- Allowed-character verification initially omitted a forbidden-character probe.
+- Trailing underscore verification generated incorrect or weak examples.
+- Consecutive underscore verification initially failed to test a value containing `__`.
+- The model sometimes omitted the required `expected` field.
+- The agent repeatedly reported `SATISFIED` even when executable probes demonstrated a requirement violation.
+
+### Improvements
+
+The deterministic critic now guarantees important probes such as:
+
+- length 20 -> `VALID`
+- length 21 -> `INVALID_USERNAME`
+- `abc!` -> `INVALID_USERNAME`
+- `_abc` -> `INVALID_USERNAME`
+- `abc_` -> `INVALID_USERNAME`
+- `a__b` -> `INVALID_USERNAME`
+
+Execution evidence identified confirmed violations for:
+
+- AC-01: maximum username length
+- AC-02: allowed-character restriction
+- AC-03: leading underscore restriction
+- AC-04: trailing underscore restriction
+- AC-05: consecutive underscore restriction
+
+No violation was confirmed by the current probes for:
+
+- AC-06
+- AC-07
+
+### Result
+
+All current unit tests pass: 5/5.
+
+The final verification layer now produces execution-grounded verdicts.
+
+For AC-01 through AC-05, the reasoning agent reported:
+
+`SATISFIED`
+
+but executable evidence produced:
+
+`VIOLATED`
+
+For AC-06 and AC-07, all generated probes matched the implementation and the final verdict remained:
+
+`SATISFIED`
+
+### Decision / Learning
+
+LLM reasoning should guide verification, but it should not be treated as the final source of truth.
+
+Generated probes must be validated, repaired where necessary, and executed against the implementation.
+
+SpecGuard therefore uses a hybrid approach:
+
+`Requirement -> Semantic Agent -> Verification Agent -> Deterministic Probe Critic -> Execution -> Final Verdict`
+
+The final verdict is derived from executable evidence rather than blindly trusting the model's self-reported assessment.
