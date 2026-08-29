@@ -1,0 +1,43 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/falguniislam/Documents/specguard-agentic-verification/.venv/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/falguniislam/Documents/specguard-agentic-verification
+configfile: pytest.ini
+collecting ... collected 10 items
+
+evaluator_test.py::test_valid_withdrawal PASSED                          [ 10%]
+evaluator_test.py::test_minimum_boundary PASSED                          [ 20%]
+evaluator_test.py::test_maximum_boundary PASSED                          [ 30%]
+evaluator_test.py::test_below_minimum PASSED                             [ 40%]
+evaluator_test.py::test_above_maximum PASSED                             [ 50%]
+evaluator_test.py::test_string_amount PASSED                             [ 60%]
+evaluator_test.py::test_string_balance PASSED                            [ 70%]
+evaluator_test.py::test_exceeds_balance FAILED                           [ 80%]
+evaluator_test.py::test_boolean_amount PASSED                            [ 90%]
+evaluator_test.py::test_boolean_balance FAILED                           [100%]
+
+=================================== FAILURES ===================================
+_____________________________ test_exceeds_balance _____________________________
+
+    def test_exceeds_balance():
+>       assert validate_withdrawal(101, 100) == "DECLINED"
+E       AssertionError: assert 'APPROVED' == 'DECLINED'
+E         
+E         - DECLINED
+E         + APPROVED
+
+evaluator_test.py:33: AssertionError
+_____________________________ test_boolean_balance _____________________________
+
+    def test_boolean_balance():
+>       assert validate_withdrawal(100, True) == "INVALID_WITHDRAWAL"
+E       AssertionError: assert 'APPROVED' == 'INVALID_WITHDRAWAL'
+E         
+E         - INVALID_WITHDRAWAL
+E         + APPROVED
+
+evaluator_test.py:41: AssertionError
+=========================== short test summary info ============================
+FAILED evaluator_test.py::test_exceeds_balance - AssertionError: assert 'APPR...
+FAILED evaluator_test.py::test_boolean_balance - AssertionError: assert 'APPR...
+========================= 2 failed, 8 passed in 0.02s ==========================

@@ -756,6 +756,155 @@ def _repair_required_probes(
         ]
 
     # -------------------------------------------------
+    # CASE 10: WITHDRAWAL VALIDATION
+    # -------------------------------------------------
+
+    if (
+        "withdrawal amount must be a number" in description
+    ):
+        return [
+            {
+                "input": {"amount": 100, "balance": 500},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": "100", "balance": 500},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+        ]
+
+    if (
+        "withdrawal amount must be at least 10" in description
+    ):
+        return [
+            {
+                "input": {"amount": 10, "balance": 500},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 9, "balance": 500},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+        ]
+
+    if (
+        "withdrawal amount must not exceed 500" in description
+    ):
+        return [
+            {
+                "input": {"amount": 500, "balance": 500},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 501, "balance": 1000},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+        ]
+
+    if (
+        "account balance must be a number" in description
+        and "withdrawal" in description
+    ):
+        return [
+            {
+                "input": {"amount": 100, "balance": 500},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 100, "balance": "500"},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+        ]
+
+    if (
+        "withdrawal amount must not exceed the account balance"
+        in description
+    ):
+        return [
+            {
+                "input": {"amount": 100, "balance": 100},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 101, "balance": 100},
+                "expected": "DECLINED",
+            },
+        ]
+
+    if (
+        "boolean values must not be accepted" in description
+        and "withdrawal" in description
+    ):
+        return [
+            {
+                "input": {"amount": True, "balance": 500},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+            {
+                "input": {"amount": 100, "balance": True},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+            {
+                "input": {"amount": 100, "balance": 500},
+                "expected": "APPROVED",
+            },
+        ]
+
+    if (
+        "return approved" in description
+        and "all requirements are satisfied" in description
+        and "withdrawal" in description
+    ):
+        return [
+            {
+                "input": {"amount": 10, "balance": 500},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 100, "balance": 500},
+                "expected": "APPROVED",
+            },
+            {
+                "input": {"amount": 500, "balance": 500},
+                "expected": "APPROVED",
+            },
+        ]
+
+    if (
+        "return declined" in description
+        and "withdrawal amount exceeds" in description
+    ):
+        return [
+            {
+                "input": {"amount": 101, "balance": 100},
+                "expected": "DECLINED",
+            },
+            {
+                "input": {"amount": 100, "balance": 100},
+                "expected": "APPROVED",
+            },
+        ]
+
+    if (
+        "return invalid_withdrawal" in description
+        and "input validation requirement" in description
+    ):
+        return [
+            {
+                "input": {"amount": 9, "balance": 500},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+            {
+                "input": {"amount": "100", "balance": 500},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+            {
+                "input": {"amount": 100, "balance": True},
+                "expected": "INVALID_WITHDRAWAL",
+            },
+        ]
+
+    # -------------------------------------------------
     # CASE 09: COUPON VALIDATION
     # -------------------------------------------------
 
@@ -900,7 +1049,7 @@ def _repair_required_probes(
             },
             {
                 "input": {"amount": "50", "balance": 100},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
         ]
 
@@ -914,11 +1063,11 @@ def _repair_required_probes(
             },
             {
                 "input": {"amount": 0, "balance": 100},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
             {
                 "input": {"amount": -1, "balance": 100},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
         ]
 
@@ -932,7 +1081,7 @@ def _repair_required_probes(
             },
             {
                 "input": {"amount": 50, "balance": "100"},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
         ]
 
@@ -946,7 +1095,7 @@ def _repair_required_probes(
             },
             {
                 "input": {"amount": 1, "balance": -1},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
         ]
 
@@ -970,11 +1119,11 @@ def _repair_required_probes(
         return [
             {
                 "input": {"amount": True, "balance": 100},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
             {
                 "input": {"amount": 50, "balance": True},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
             {
                 "input": {"amount": 50, "balance": 100},
@@ -1019,15 +1168,15 @@ def _repair_required_probes(
         return [
             {
                 "input": {"amount": 0, "balance": 100},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
             {
                 "input": {"amount": "50", "balance": 100},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
             {
                 "input": {"amount": 50, "balance": -1},
-                "expected": "INVALID_TRANSFER",
+                "expected": invalid_result,
             },
         ]
 
