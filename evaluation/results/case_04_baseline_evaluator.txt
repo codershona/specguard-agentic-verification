@@ -1,0 +1,14 @@
+=== CASE 04 BASELINE EVALUATOR ===
+
+Developer tests:
+Passed: 2/2
+Pass rate: 100%
+
+Independent evaluator:
+Passed: 7/9
+Failed: 2/9
+Pass rate: 77.8%
+
+Observed failures:
+- Quantity above the maximum allowed value (101) is incorrectly accepted as VALID.
+- Boolean True is incorrectly accepted as VALID even though the requirement expects an integer quantity.

@@ -117,6 +117,50 @@ because those inputs do not contain consecutive underscores.
 
 CRITICAL OUTPUT RULES:
 
+INPUT TYPE RULES:
+
+The JSON "input" value MUST preserve the real data type required by
+the acceptance criterion.
+
+For integer or numeric requirements:
+- use 1, not "1"
+- use 0, not "0"
+- use 101, not "101"
+- use 1.5, not "1.5"
+
+For boolean requirements:
+- use true or false as JSON booleans
+- never use "true" or "false" as strings
+
+For text, username, password, or email requirements:
+- use JSON strings
+
+Examples:
+
+Integer probe:
+{{
+  "input": 101,
+  "expected": "INVALID_QUANTITY"
+}}
+
+Float probe:
+{{
+  "input": 1.5,
+  "expected": "INVALID_QUANTITY"
+}}
+
+Boolean probe:
+{{
+  "input": true,
+  "expected": "INVALID_QUANTITY"
+}}
+
+String probe:
+{{
+  "input": "user@example.com",
+  "expected": "VALID"
+}}
+
 Every probe MUST contain exactly these two fields:
 - "input"
 - "expected"
@@ -240,11 +284,14 @@ def _validate_verification_response(
                 f"Probe {index} must be an object."
             )
 
-        test_input = (
-            probe.get("input")
-            or probe.get("test_input")
-            or probe.get("value")
-        )
+        if "input" in probe:
+           test_input = probe["input"]
+        elif "test_input" in probe:
+           test_input = probe["test_input"]
+        elif "value" in probe:
+           test_input = probe["value"]
+        else:
+           test_input = None
 
         expected = (
             probe.get("expected")
@@ -265,8 +312,14 @@ def _validate_verification_response(
                 "Use exactly the key 'expected'."
             )
 
-        if not isinstance(test_input, str):
-            test_input = str(test_input)
+        if not isinstance(
+            test_input,
+            (str, int, float, bool),
+        ):
+            raise ValueError(
+                f"Probe {index} has unsupported input type "
+                f"{type(test_input).__name__}."
+            )
 
         if not isinstance(expected, str):
             expected = str(expected)
