@@ -1,0 +1,43 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/falguniislam/Documents/specguard-agentic-verification/.venv/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/falguniislam/Documents/specguard-agentic-verification
+configfile: pytest.ini
+collecting ... collected 10 items
+
+evaluator_test.py::test_valid_single_day PASSED                          [ 10%]
+evaluator_test.py::test_valid_full_range PASSED                          [ 20%]
+evaluator_test.py::test_start_below_minimum_invalid PASSED               [ 30%]
+evaluator_test.py::test_start_negative_invalid PASSED                    [ 40%]
+evaluator_test.py::test_end_exceeds_maximum_invalid FAILED               [ 50%]
+evaluator_test.py::test_start_greater_than_end_invalid PASSED            [ 60%]
+evaluator_test.py::test_non_integer_start_invalid PASSED                 [ 70%]
+evaluator_test.py::test_non_integer_end_invalid PASSED                   [ 80%]
+evaluator_test.py::test_boolean_start_invalid FAILED                     [ 90%]
+evaluator_test.py::test_boolean_end_invalid PASSED                       [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_end_exceeds_maximum_invalid _______________________
+
+    def test_end_exceeds_maximum_invalid():
+>       assert validate_date_range(10, 32) == "INVALID_DATE_RANGE"
+E       AssertionError: assert 'VALID' == 'INVALID_DATE_RANGE'
+E         
+E         - INVALID_DATE_RANGE
+E         + VALID
+
+evaluator_test.py:21: AssertionError
+__________________________ test_boolean_start_invalid __________________________
+
+    def test_boolean_start_invalid():
+>       assert validate_date_range(True, 10) == "INVALID_DATE_RANGE"
+E       AssertionError: assert 'VALID' == 'INVALID_DATE_RANGE'
+E         
+E         - INVALID_DATE_RANGE
+E         + VALID
+
+evaluator_test.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED evaluator_test.py::test_end_exceeds_maximum_invalid - AssertionError: ...
+FAILED evaluator_test.py::test_boolean_start_invalid - AssertionError: assert...
+========================= 2 failed, 8 passed in 0.02s ==========================

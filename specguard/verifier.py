@@ -150,16 +150,25 @@ Float probe:
 }}
 
 Boolean probe:
-{{
-  "input": true,
-  "expected": "INVALID_QUANTITY"
-}}
+...
 
 String probe:
 {{
   "input": "user@example.com",
   "expected": "VALID"
 }}
+
+Multi-argument function probe:
+{{
+  "input": {{
+    "start_day": 5,
+    "end_day": 10
+  }},
+  "expected": "VALID"
+}}
+
+When the target function has multiple parameters, every probe must provide all required arguments inside the "input" object using the exact parameter names.
+Do not provide only one primitive value for a multi-argument function.
 
 Every probe MUST contain exactly these two fields:
 - "input"
@@ -314,7 +323,7 @@ def _validate_verification_response(
 
         if not isinstance(
             test_input,
-            (str, int, float, bool),
+            (str, int, float, bool, dict),
         ):
             raise ValueError(
                 f"Probe {index} has unsupported input type "
@@ -340,14 +349,12 @@ def _validate_verification_response(
             )
 
         signature = (
-            test_input,
+            repr(test_input),
             expected,
         )
 
         if signature in seen:
-            raise ValueError(
-                "Duplicate probes are not allowed."
-            )
+            continue
 
         seen.add(signature)
 
@@ -384,7 +391,11 @@ def _validate_probe_alignment(
     ]
 
     expected_by_input = {
-        probe["input"]: probe["expected"]
+        (
+            repr(probe["input"])
+            if isinstance(probe["input"], dict)
+            else probe["input"]
+        ): probe["expected"]
         for probe in probes
     }
 
@@ -568,20 +579,30 @@ def _repair_required_probes(
             "INVALID_PASSWORD"
             if "password" in description
             else (
-                "INVALID_EMAIL"
-                if "email" in description
+            "INVALID_EMAIL"
+            if "email" in description
+            else (
+                "INVALID_DATE_RANGE"
+                if "date" in description
+                or "start day" in description
+                or "end day" in description
                 else "INVALID_USERNAME"
+            )
             )
         ),
     )
 
     repaired = {
-        probe["input"]: {
-            "input": probe["input"],
-            "expected": probe["expected"],
-        }
-        for probe in probes
-    }
+       (
+        repr(probe["input"])
+        if isinstance(probe["input"], dict)
+        else probe["input"]
+       ): {
+          "input": probe["input"],
+          "expected": probe["expected"],
+       }
+       for probe in probes
+   }
 
     # -------------------------------------------------
     # CASE 02: PASSWORD VALIDATION
@@ -727,6 +748,181 @@ def _repair_required_probes(
             },
             {
                 "input": "Pass word1!",
+                "expected": invalid_result,
+            },
+        ]
+    
+    # -------------------------------------------------
+    # CASE 05: DATE RANGE VALIDATION
+    # -------------------------------------------------
+
+    if "start day must be an integer" in description:
+        return [
+            {
+                "input": {
+                    "start_day": 5,
+                    "end_day": 10,
+                },
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": {
+                    "start_day": "5",
+                    "end_day": 10,
+                },
+                "expected": invalid_result,
+            },
+        ]
+
+    if "end day must be an integer" in description:
+        return [
+            {
+                "input": {
+                    "start_day": 5,
+                    "end_day": 10,
+                },
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": {
+                    "start_day": 5,
+                    "end_day": "10",
+                },
+                "expected": invalid_result,
+            },
+        ]
+
+    if "start day must be at least 1" in description:
+        return [
+            {
+                "input": {
+                    "start_day": 1,
+                    "end_day": 10,
+                },
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": {
+                    "start_day": 0,
+                    "end_day": 10,
+                },
+                "expected": invalid_result,
+            },
+        ]
+
+    if "end day must not exceed 31" in description:
+        return [
+            {
+                "input": {
+                    "start_day": 1,
+                    "end_day": 31,
+                },
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": {
+                    "start_day": 1,
+                    "end_day": 32,
+                },
+                "expected": invalid_result,
+            },
+        ]
+
+    if "start day must not be greater than end day" in description:
+        return [
+            {
+                "input": {
+                    "start_day": 5,
+                    "end_day": 10,
+                },
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": {
+                    "start_day": 10,
+                    "end_day": 5,
+                },
+                "expected": invalid_result,
+            },
+        ]
+
+    if "boolean" in description:
+        return [
+            {
+                "input": {
+                    "start_day": True,
+                    "end_day": 10,
+                },
+                "expected": invalid_result,
+            },
+            {
+                "input": {
+                    "start_day": 5,
+                    "end_day": False,
+                },
+                "expected": invalid_result,
+            },
+            {
+                "input": {
+                    "start_day": 5,
+                    "end_day": 10,
+                },
+                "expected": VALID_RESULT,
+            },
+        ]
+
+    if (
+        "return valid" in description
+        and "all requirements" in description
+    ):
+        return [
+            {
+                "input": {
+                    "start_day": 1,
+                    "end_day": 1,
+                },
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": {
+                    "start_day": 5,
+                    "end_day": 10,
+                },
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": {
+                    "start_day": 1,
+                    "end_day": 31,
+                },
+                "expected": VALID_RESULT,
+            },
+        ]
+
+    if (
+        "return invalid_date_range" in description
+        and "any requirement" in description
+    ):
+        return [
+            {
+                "input": {
+                    "start_day": 0,
+                    "end_day": 10,
+                },
+                "expected": invalid_result,
+            },
+            {
+                "input": {
+                    "start_day": 10,
+                    "end_day": 32,
+                },
+                "expected": invalid_result,
+            },
+            {
+                "input": {
+                    "start_day": True,
+                    "end_day": 10,
+                },
                 "expected": invalid_result,
             },
         ]

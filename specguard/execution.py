@@ -57,7 +57,10 @@ def execute_probe(
     expected = probe["expected"]
 
     try:
-        actual = target_function(test_input)
+        if isinstance(test_input, dict):
+         actual = target_function(**test_input)
+        else:
+         actual = target_function(test_input)
 
         return {
             "input": test_input,
