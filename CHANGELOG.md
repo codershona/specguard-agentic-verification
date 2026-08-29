@@ -184,3 +184,48 @@ SpecGuard therefore uses a hybrid approach:
 `Requirement -> Semantic Agent -> Verification Agent -> Deterministic Probe Critic -> Execution -> Final Verdict`
 
 The final verdict is derived from executable evidence rather than blindly trusting the model's self-reported assessment.
+
+
+## Iteration 4 - Independent Evaluation and Defect Recall
+
+### Goal
+
+Measure SpecGuard against an independent evaluator without exposing
+the evaluator tests to the verification agent.
+
+### Evaluation Method
+
+The independent evaluator contains 10 behavioral checks.
+
+The baseline implementation passed 3/10 checks, giving a requirement
+satisfaction rate of 30%.
+
+The remaining 7 evaluator failures were mapped to the atomic acceptance
+criteria produced by SpecGuard only after verification was completed.
+
+### Results
+
+- Acceptance criteria analyzed: 7
+- Criteria classified as violated: 5
+- Criteria classified as satisfied: 2
+- Criterion violation rate: 71.4%
+- Independent evaluator failures: 7
+- Evaluator failures detected by SpecGuard: 7/7
+- Defect recall: 100.0%
+
+### Key Finding
+
+SpecGuard detected every defect exposed by the independent evaluator
+for Case 01.
+
+The 100% result represents defect recall, not implementation correctness.
+The target implementation itself remains at 30% evaluator pass rate.
+
+### Decision / Learning
+
+Independent evaluation confirms that execution-grounded verification can
+identify requirement violations that are missed by the repository's
+existing developer tests.
+
+The next step is to evaluate SpecGuard across additional cases to determine
+whether this performance generalizes beyond Case 01.

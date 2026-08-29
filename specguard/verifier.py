@@ -6,6 +6,8 @@ from specguard.llm import OllamaClient
 
 
 MAX_RETRIES = 3
+VALID_RESULT = "VALID"
+INVALID_RESULT_PREFIX = "INVALID_"
 
 
 def _build_verification_prompt(
@@ -30,6 +32,39 @@ Generate between 2 and 4 probes.
 Important:
 Each probe must directly test THIS acceptance criterion.
 Avoid inputs that only test unrelated requirements.
+
+PROBE ISOLATION RULE:
+
+A probe must isolate the acceptance criterion being tested.
+
+When the implementation has multiple validation rules, construct the
+probe so that unrelated validation rules are satisfied whenever possible.
+
+For a negative probe, change only the property relevant to THIS
+acceptance criterion while keeping unrelated properties valid.
+
+Example:
+
+If a password must contain uppercase, lowercase, digit, and special
+characters, and THIS criterion is "must contain at least one lowercase
+ASCII letter":
+
+Useful probes:
+- "Password1!" -> VALID
+- "PASSWORD1!" -> INVALID_PASSWORD
+
+Bad probe:
+- "abcdefgh" -> VALID
+
+The bad probe is invalid because it also lacks uppercase, digit, and
+special characters, so a failure would not isolate the lowercase
+criterion.
+
+Similarly, when testing maximum password length, use inputs that still
+satisfy the other password requirements.
+
+Do not use strings consisting only of digits or only letters if those
+inputs would violate unrelated validation rules.
 
 Examples:
 
@@ -88,7 +123,14 @@ Every probe MUST contain exactly these two fields:
 
 "expected" MUST always be either:
 - "VALID"
+- a value beginning with "INVALID_"
+
+Examples:
 - "INVALID_USERNAME"
+- "INVALID_PASSWORD"
+
+Use the invalid result type that matches the supplied implementation
+and acceptance criterion.
 
 Never omit "expected".
 Never use expected_result, result, output, status, or any other field name.
@@ -105,7 +147,7 @@ Use exactly:
   "probes": [
     {{
       "input": "example",
-      "expected": "expected result"
+      "expected": "VALID"
     }}
   ]
 }}
@@ -198,7 +240,6 @@ def _validate_verification_response(
                 f"Probe {index} must be an object."
             )
 
-        # Accept a few common model variations.
         test_input = (
             probe.get("input")
             or probe.get("test_input")
@@ -232,15 +273,17 @@ def _validate_verification_response(
 
         expected = expected.strip()
 
-        if expected not in {
-            "VALID",
-            "INVALID_USERNAME",
-        }:
+        if not (
+            expected == VALID_RESULT
+            or expected.startswith(
+                INVALID_RESULT_PREFIX
+            )
+        ):
             raise ValueError(
                 f"Probe {index} has invalid expected "
                 f"value {expected!r}. "
                 "Expected must be VALID or "
-                "INVALID_USERNAME."
+                "start with INVALID_."
             )
 
         signature = (
@@ -304,18 +347,18 @@ def _validate_probe_alignment(
         if not violating:
             raise ValueError(
                 "Leading-underscore criterion requires a "
-                "valid-length probe beginning with '_'. "
-                "Example: '_abc' -> INVALID_USERNAME."
+                "valid-length probe beginning with '_'."
             )
 
         if not any(
-            expected_by_input[value]
-            == "INVALID_USERNAME"
+            expected_by_input[value].startswith(
+                INVALID_RESULT_PREFIX
+            )
             for value in violating
         ):
             raise ValueError(
                 "A leading-underscore probe must expect "
-                "INVALID_USERNAME."
+                "an INVALID_* result."
             )
 
     # Trailing underscore
@@ -330,18 +373,18 @@ def _validate_probe_alignment(
         if not violating:
             raise ValueError(
                 "Trailing-underscore criterion requires a "
-                "valid-length probe ending with '_'. "
-                "Example: 'abc_' -> INVALID_USERNAME."
+                "valid-length probe ending with '_'."
             )
 
         if not any(
-            expected_by_input[value]
-            == "INVALID_USERNAME"
+            expected_by_input[value].startswith(
+                INVALID_RESULT_PREFIX
+            )
             for value in violating
         ):
             raise ValueError(
                 "A trailing-underscore probe must expect "
-                "INVALID_USERNAME."
+                "an INVALID_* result."
             )
 
     # Consecutive underscores
@@ -356,21 +399,21 @@ def _validate_probe_alignment(
         if not violating:
             raise ValueError(
                 "Consecutive-underscore criterion requires "
-                "a probe containing '__'. "
-                "Example: 'a__b' -> INVALID_USERNAME."
+                "a probe containing '__'."
             )
 
         if not any(
-            expected_by_input[value]
-            == "INVALID_USERNAME"
+            expected_by_input[value].startswith(
+                INVALID_RESULT_PREFIX
+            )
             for value in violating
         ):
             raise ValueError(
-                "A probe containing consecutive underscores "
-                "must expect INVALID_USERNAME."
+                "A consecutive-underscore probe must expect "
+                "an INVALID_* result."
             )
 
-    # Allowed characters
+    # Allowed username characters
     if (
         "ascii" in description
         and "underscore" in description
@@ -395,21 +438,21 @@ def _validate_probe_alignment(
         if not forbidden_probe:
             raise ValueError(
                 "Allowed-character criterion requires a "
-                "valid-length probe containing a forbidden "
-                "character, such as 'abc!'."
+                "probe containing a forbidden character."
             )
 
         if not any(
-            expected_by_input[value]
-            == "INVALID_USERNAME"
+            expected_by_input[value].startswith(
+                INVALID_RESULT_PREFIX
+            )
             for value in forbidden_probe
         ):
             raise ValueError(
                 "Forbidden-character probes must expect "
-                "INVALID_USERNAME."
+                "an INVALID_* result."
             )
 
-    # 3 to 20 length boundary
+    # Case 01: 3 to 20 length boundary
     if (
         "3" in description
         and "20" in description
@@ -420,30 +463,31 @@ def _validate_probe_alignment(
             for value in inputs
         }
 
-        required = {
-            3: "VALID",
-            2: "INVALID_USERNAME",
-            20: "VALID",
-            21: "INVALID_USERNAME",
+        required_lengths = {
+            3: VALID_RESULT,
+            20: VALID_RESULT,
         }
 
-        missing = []
-
-        for length, expected in required.items():
-            if (
-                length not in lengths
-                or lengths[length] != expected
-            ):
-                missing.append(
-                    f"length {length} -> {expected}"
+        for length, expected in required_lengths.items():
+            if lengths.get(length) != expected:
+                raise ValueError(
+                    "Numeric boundary probes are incomplete. "
+                    f"Required length {length} -> {expected}."
                 )
 
-        if missing:
-            raise ValueError(
-                "Numeric boundary probes are incomplete. "
-                "Required: "
-                + ", ".join(missing)
-            )
+        for length in (2, 21):
+            result = lengths.get(length)
+
+            if (
+                result is None
+                or not result.startswith(
+                    INVALID_RESULT_PREFIX
+                )
+            ):
+                raise ValueError(
+                    "Numeric boundary probes are incomplete. "
+                    f"Required length {length} -> INVALID_*."
+                )
 
 
 def _repair_required_probes(
@@ -452,9 +496,27 @@ def _repair_required_probes(
 ) -> list[dict]:
     """
     Deterministically repair mandatory probe coverage.
+
+    Keeps Case 01 username probes and adds isolated
+    Case 02 password probes.
     """
 
     description = criterion.description.lower()
+
+    invalid_result = next(
+        (
+            probe["expected"]
+            for probe in probes
+            if probe["expected"].startswith(
+                INVALID_RESULT_PREFIX
+            )
+        ),
+        (
+            "INVALID_PASSWORD"
+            if "password" in description
+            else "INVALID_USERNAME"
+        ),
+    )
 
     repaired = {
         probe["input"]: {
@@ -464,80 +526,233 @@ def _repair_required_probes(
         for probe in probes
     }
 
+    # -------------------------------------------------
+    # CASE 02: PASSWORD VALIDATION
+    # -------------------------------------------------
+
+    # Password length: 8 to 16 inclusive.
+    if (
+        "password" in description
+        and "8" in description
+        and "16" in description
+        and "character" in description
+    ):
+        return [
+            {
+                "input": "Aa1!aaaa",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "Aa1!aaa",
+                "expected": invalid_result,
+            },
+            {
+                "input": "Aa1!aaaaaaaaaaaa",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "Aa1!aaaaaaaaaaaaa",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Password must contain uppercase.
+    if (
+        "password" in description
+        and "uppercase" in description
+    ):
+        return [
+            {
+                "input": "Password1!",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "password1!",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Password must contain lowercase.
+    if (
+        "password" in description
+        and "lowercase" in description
+    ):
+        return [
+            {
+                "input": "Password1!",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "PASSWORD1!",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Password must contain a digit.
+    if (
+        "password" in description
+        and "digit" in description
+    ):
+        return [
+            {
+                "input": "Password1!",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "Password!",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Password must contain a special character.
+    if (
+        "password" in description
+        and "special character" in description
+    ):
+        return [
+            {
+                "input": "Password1!",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "Password1",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Password must not contain spaces.
+    if (
+        "password" in description
+        and "not contain spaces" in description
+    ):
+        return [
+            {
+                "input": "Password1!",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "Pass word1!",
+                "expected": invalid_result,
+            },
+        ]
+
+    # Return VALID when all password requirements pass.
+    if (
+        "return valid" in description
+        and "all requirements" in description
+    ):
+        return [
+            {
+                "input": "Password1!",
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "Secure1!",
+                "expected": VALID_RESULT,
+            },
+        ]
+
+    # Return INVALID_PASSWORD when any requirement fails.
+    if (
+        "return invalid_" in description
+        and "any requirement" in description
+    ):
+        return [
+            {
+                "input": "Password!",
+                "expected": invalid_result,
+            },
+            {
+                "input": "Password1",
+                "expected": invalid_result,
+            },
+            {
+                "input": "Pass word1!",
+                "expected": invalid_result,
+            },
+        ]
+
+    # -------------------------------------------------
+    # CASE 01: USERNAME VALIDATION
+    # -------------------------------------------------
+
     # Numeric range: 3 to 20 characters inclusive.
     if (
         "3" in description
         and "20" in description
         and "character" in description
     ):
-        repaired = {
-            "a" * 3: {
+        return [
+            {
                 "input": "a" * 3,
-                "expected": "VALID",
+                "expected": VALID_RESULT,
             },
-            "a" * 2: {
+            {
                 "input": "a" * 2,
-                "expected": "INVALID_USERNAME",
+                "expected": invalid_result,
             },
-            "a" * 20: {
+            {
                 "input": "a" * 20,
-                "expected": "VALID",
+                "expected": VALID_RESULT,
             },
-            "a" * 21: {
+            {
                 "input": "a" * 21,
-                "expected": "INVALID_USERNAME",
+                "expected": invalid_result,
             },
-        }
+        ]
 
-    # Allowed characters.
-    elif (
+    # Allowed username characters.
+    if (
         "ascii" in description
         and "underscore" in description
     ):
         repaired["abc123"] = {
             "input": "abc123",
-            "expected": "VALID",
+            "expected": VALID_RESULT,
         }
+
         repaired["abc!"] = {
             "input": "abc!",
-            "expected": "INVALID_USERNAME",
+            "expected": invalid_result,
         }
 
     # Leading underscore.
     elif "not begin with an underscore" in description:
         repaired["_abc"] = {
             "input": "_abc",
-            "expected": "INVALID_USERNAME",
+            "expected": invalid_result,
         }
+
         repaired["abc"] = {
             "input": "abc",
-            "expected": "VALID",
+            "expected": VALID_RESULT,
         }
 
     # Trailing underscore.
     elif "not end with an underscore" in description:
         repaired["abc_"] = {
             "input": "abc_",
-            "expected": "INVALID_USERNAME",
+            "expected": invalid_result,
         }
+
         repaired["abc"] = {
             "input": "abc",
-            "expected": "VALID",
+            "expected": VALID_RESULT,
         }
 
     # Consecutive underscores.
     elif "consecutive underscores" in description:
         repaired["a__b"] = {
             "input": "a__b",
-            "expected": "INVALID_USERNAME",
+            "expected": invalid_result,
         }
+
         repaired["a_b"] = {
             "input": "a_b",
-            "expected": "VALID",
+            "expected": VALID_RESULT,
         }
 
     return list(repaired.values())[:4]
-
 
 def verify_criterion(
     source_code: str,
@@ -570,7 +785,7 @@ def verify_criterion(
             result["probes"] = _repair_required_probes(
                 criterion,
                 result["probes"],
-)
+            )
 
             _validate_probe_alignment(
                 criterion,

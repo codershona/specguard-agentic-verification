@@ -1,0 +1,78 @@
+=== ITERATION 04 SCORING SUMMARY ===
+
+Objective:
+Evaluate whether execution-grounded SpecGuard verification can detect
+real requirement violations across multiple independent cases.
+
+CASE 01 — USERNAME VALIDATION
+
+Baseline independent evaluator:
+- Passed: 3/10
+- Failed: 7/10
+- Pass rate: 30%
+
+SpecGuard improvement:
+- Semantic requirements decomposed into atomic acceptance criteria.
+- Multiple isolated probes generated per criterion.
+- Probes executed directly against the implementation.
+- Final verdict derived from executable evidence rather than relying
+  only on the Verification Agent's self-reported verdict.
+- Targeted repair improved boundary and validation-rule coverage.
+
+Result:
+SpecGuard successfully exposed the known username-validation defects
+that were missed by the developer tests.
+
+
+CASE 02 — PASSWORD VALIDATION
+
+Developer tests:
+- Passed: 2/2
+- Pass rate: 100%
+
+Independent evaluator:
+- Passed: 5/9
+- Failed: 4/9
+- Pass rate: 55.6%
+
+Observed implementation defects:
+1. Maximum password length not enforced.
+2. Digit requirement not enforced.
+3. Special-character requirement not enforced.
+4. Spaces are not rejected.
+
+Final SpecGuard findings:
+- AC-01 Length constraint: VIOLATED
+- AC-02 Uppercase requirement: SATISFIED
+- AC-03 Lowercase requirement: SATISFIED
+- AC-04 Digit requirement: VIOLATED
+- AC-05 Special-character requirement: VIOLATED
+- AC-06 Space rejection: VIOLATED
+- AC-07 Valid-result behavior: SATISFIED
+- AC-08 Invalid-result behavior: VIOLATED
+
+Defect detection:
+- Known independent-evaluator defects: 4
+- Known defects detected by SpecGuard: 4
+- Defect recall: 100%
+
+Key improvement:
+Earlier agent-generated probes sometimes tested multiple requirements
+at once and produced misleading evidence.
+
+Iteration 04 introduced deterministic probe repair and isolation so
+critical requirement dimensions are tested independently.
+
+The final verdict is grounded in actual execution:
+- matched = True means the implementation behaved as expected for
+  that probe.
+- matched = False provides executable evidence of a requirement
+  violation.
+
+Conclusion:
+Case 02 demonstrates that developer tests can report 100% success while
+the implementation still violates multiple requirements.
+
+SpecGuard detected all four concrete defects identified independently
+by the Case 02 evaluator, demonstrating the value of semantic
+decomposition combined with isolated executable verification probes.

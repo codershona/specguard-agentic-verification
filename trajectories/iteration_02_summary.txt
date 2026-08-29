@@ -1,0 +1,40 @@
+=== ITERATION 02 SUMMARY ===
+
+Goal:
+Improve requirement decomposition using a semantic reasoning agent.
+
+Changes:
+- Added local Ollama integration.
+- Used qwen3:4b as the reasoning model.
+- Added semantic requirement decomposition.
+- Added JSON-constrained model output.
+- Added validation and retry handling.
+- Processed requirements independently.
+- Assigned requirement numbers deterministically in Python.
+- Added semantic decomposer unit tests using a fake deterministic LLM.
+
+Failures observed:
+- Model initially mixed reasoning text with JSON.
+- Model returned malformed JSON fields.
+- Model generated invalid requirement numbers.
+- Model over-decomposed numeric ranges.
+- Model duplicated requirements.
+- Requirement 3 was initially not split correctly.
+
+Improvement:
+Requirement 3 was eventually decomposed into two independent criteria:
+
+- Username must not begin with an underscore.
+- Username must not end with an underscore.
+
+Evidence:
+Semantic decomposition test passed.
+At the end of Iteration 2, the project test suite passed 3/3 tests.
+
+Learning:
+LLM reasoning improved semantic decomposition, but model output could not
+be trusted without deterministic validation, retries, and traceability.
+
+Decision:
+Use the semantic agent for reasoning, while keeping deterministic Python
+validation around its output.

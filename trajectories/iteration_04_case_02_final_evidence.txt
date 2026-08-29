@@ -1,0 +1,129 @@
+=== CASE 02 FINAL REPAIRED EVIDENCE ===
+
+AC-01 (Requirement 1)
+Agent verdict: SATISFIED
+Final verdict: VIOLATED
+  Probe 1:
+    Input: 'Aa1!aaaa'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'Aa1!aaa'
+    Expected: INVALID_PASSWORD
+    Actual: INVALID_PASSWORD
+    Matched: True
+  Probe 3:
+    Input: 'Aa1!aaaaaaaaaaaa'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 4:
+    Input: 'Aa1!aaaaaaaaaaaaa'
+    Expected: INVALID_PASSWORD
+    Actual: VALID
+    Matched: False
+
+AC-02 (Requirement 2)
+Agent verdict: SATISFIED
+Final verdict: SATISFIED
+  Probe 1:
+    Input: 'Password1!'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'password1!'
+    Expected: INVALID_PASSWORD
+    Actual: INVALID_PASSWORD
+    Matched: True
+
+AC-03 (Requirement 3)
+Agent verdict: SATISFIED
+Final verdict: SATISFIED
+  Probe 1:
+    Input: 'Password1!'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'PASSWORD1!'
+    Expected: INVALID_PASSWORD
+    Actual: INVALID_PASSWORD
+    Matched: True
+
+AC-04 (Requirement 4)
+Agent verdict: SATISFIED
+Final verdict: VIOLATED
+  Probe 1:
+    Input: 'Password1!'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'Password!'
+    Expected: INVALID_PASSWORD
+    Actual: VALID
+    Matched: False
+
+AC-05 (Requirement 5)
+Agent verdict: SATISFIED
+Final verdict: VIOLATED
+  Probe 1:
+    Input: 'Password1!'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'Password1'
+    Expected: INVALID_PASSWORD
+    Actual: VALID
+    Matched: False
+
+AC-06 (Requirement 6)
+Agent verdict: SATISFIED
+Final verdict: VIOLATED
+  Probe 1:
+    Input: 'Password1!'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'Pass word1!'
+    Expected: INVALID_PASSWORD
+    Actual: VALID
+    Matched: False
+
+AC-07 (Requirement 7)
+Agent verdict: SATISFIED
+Final verdict: SATISFIED
+  Probe 1:
+    Input: 'Password1!'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'Secure1!'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+
+AC-08 (Requirement 8)
+Agent verdict: SATISFIED
+Final verdict: VIOLATED
+  Probe 1:
+    Input: 'Password!'
+    Expected: INVALID_PASSWORD
+    Actual: VALID
+    Matched: False
+  Probe 2:
+    Input: 'Password1'
+    Expected: INVALID_PASSWORD
+    Actual: VALID
+    Matched: False
+  Probe 3:
+    Input: 'Pass word1!'
+    Expected: INVALID_PASSWORD
+    Actual: VALID
+    Matched: False
+

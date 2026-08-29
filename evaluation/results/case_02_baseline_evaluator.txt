@@ -1,0 +1,17 @@
+=== CASE 02 BASELINE EVALUATOR ===
+
+Developer tests:
+Passed: 2/2
+Pass rate: 100%
+
+Independent evaluator:
+Passed: 5/9
+Failed: 4/9
+Pass rate: 55.6%
+
+Observed failures:
+- Maximum password length not enforced
+- Digit requirement not enforced
+- Special-character requirement not enforced
+- Space rejection not enforced
+

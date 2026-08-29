@@ -1,0 +1,22 @@
+=== SPECGUARD CASE 01 EVALUATION ===
+
+AC-01 -> VIOLATED
+AC-02 -> VIOLATED
+AC-03 -> VIOLATED
+AC-04 -> VIOLATED
+AC-05 -> VIOLATED
+AC-06 -> SATISFIED
+AC-07 -> SATISFIED
+
+=== SUMMARY ===
+
+Total acceptance criteria: 7
+Detected violations: 5
+Satisfied criteria: 2
+Criterion violation detection rate: 71.4%
+
+=== EVALUATOR DEFECT RECALL ===
+
+Evaluator failures: 7
+Failures detected by SpecGuard: 7
+Defect recall: 100.0%

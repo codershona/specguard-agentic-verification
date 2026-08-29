@@ -1,0 +1,58 @@
+=== CASE 02 ISOLATION V2 EVIDENCE ===
+
+AC-03
+Agent verdict: SATISFIED
+Final verdict: VIOLATED
+  Probe 1:
+    Input: 'Abcdefgh'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'ABCDEFGH'
+    Expected: INVALID_PASSWORD
+    Actual: INVALID_PASSWORD
+    Matched: True
+  Probe 3:
+    Input: 'abcdefgh'
+    Expected: VALID
+    Actual: INVALID_PASSWORD
+    Matched: False
+
+AC-04
+Agent verdict: SATISFIED
+Final verdict: SATISFIED
+  Probe 1:
+    Input: 'Password1'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'PASSWORD1'
+    Expected: INVALID_PASSWORD
+    Actual: INVALID_PASSWORD
+    Matched: True
+  Probe 3:
+    Input: 'password'
+    Expected: INVALID_PASSWORD
+    Actual: INVALID_PASSWORD
+    Matched: True
+
+AC-05
+Agent verdict: SATISFIED
+Final verdict: VIOLATED
+  Probe 1:
+    Input: 'Password1!'
+    Expected: VALID
+    Actual: VALID
+    Matched: True
+  Probe 2:
+    Input: 'PASSWORD1!'
+    Expected: INVALID_PASSWORD
+    Actual: INVALID_PASSWORD
+    Matched: True
+  Probe 3:
+    Input: 'Password1'
+    Expected: INVALID_PASSWORD
+    Actual: VALID
+    Matched: False
