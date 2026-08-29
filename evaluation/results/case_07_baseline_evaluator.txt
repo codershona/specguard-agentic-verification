@@ -1,0 +1,56 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/falguniislam/Documents/specguard-agentic-verification/.venv/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/falguniislam/Documents/specguard-agentic-verification
+configfile: pytest.ini
+collecting ... collected 10 items
+
+evaluator_test.py::test_available_username PASSED                        [ 10%]
+evaluator_test.py::test_minimum_length PASSED                            [ 20%]
+evaluator_test.py::test_too_short PASSED                                 [ 30%]
+evaluator_test.py::test_maximum_length PASSED                            [ 40%]
+evaluator_test.py::test_too_long FAILED                                  [ 50%]
+evaluator_test.py::test_taken_admin PASSED                               [ 60%]
+evaluator_test.py::test_taken_username_case_insensitive FAILED           [ 70%]
+evaluator_test.py::test_taken_john_case_insensitive FAILED               [ 80%]
+evaluator_test.py::test_non_string_integer PASSED                        [ 90%]
+evaluator_test.py::test_non_string_boolean PASSED                        [100%]
+
+=================================== FAILURES ===================================
+________________________________ test_too_long _________________________________
+
+    def test_too_long():
+>       assert check_username_availability("abcdefghijklmnop") == "INVALID_USERNAME"
+E       AssertionError: assert 'AVAILABLE' == 'INVALID_USERNAME'
+E         
+E         - INVALID_USERNAME
+E         + AVAILABLE
+
+evaluator_test.py:16: AssertionError
+_____________________ test_taken_username_case_insensitive _____________________
+
+    def test_taken_username_case_insensitive():
+>       assert check_username_availability("ADMIN") == "UNAVAILABLE"
+E       AssertionError: assert 'AVAILABLE' == 'UNAVAILABLE'
+E         
+E         - UNAVAILABLE
+E         ? --
+E         + AVAILABLE
+
+evaluator_test.py:22: AssertionError
+_______________________ test_taken_john_case_insensitive _______________________
+
+    def test_taken_john_case_insensitive():
+>       assert check_username_availability("JoHn") == "UNAVAILABLE"
+E       AssertionError: assert 'AVAILABLE' == 'UNAVAILABLE'
+E         
+E         - UNAVAILABLE
+E         ? --
+E         + AVAILABLE
+
+evaluator_test.py:25: AssertionError
+=========================== short test summary info ============================
+FAILED evaluator_test.py::test_too_long - AssertionError: assert 'AVAILABLE' ...
+FAILED evaluator_test.py::test_taken_username_case_insensitive - AssertionErr...
+FAILED evaluator_test.py::test_taken_john_case_insensitive - AssertionError: ...
+========================= 3 failed, 7 passed in 0.02s ==========================

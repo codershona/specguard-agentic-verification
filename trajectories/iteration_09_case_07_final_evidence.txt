@@ -1,0 +1,56 @@
+
+ AC-01 Requirement 1
+Agent: satisfied
+Final: satisfied
+  {'input': 'abc', 'expected': 'AVAILABLE', 'actual': 'AVAILABLE', 'matched': True, 'error': None}
+  {'input': 'ab', 'expected': 'INVALID_USERNAME', 'actual': 'INVALID_USERNAME', 'matched': True, 'error': None}
+  {'input': 'admin', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+
+ AC-02 Requirement 2
+Agent: satisfied
+Final: satisfied
+  {'input': 'abc', 'expected': 'AVAILABLE', 'actual': 'AVAILABLE', 'matched': True, 'error': None}
+  {'input': 'ab', 'expected': 'INVALID_USERNAME', 'actual': 'INVALID_USERNAME', 'matched': True, 'error': None}
+
+ AC-03 Requirement 3
+Agent: satisfied
+Final: violated
+  {'input': 'aaaaaaaaaaaaaaa', 'expected': 'AVAILABLE', 'actual': 'AVAILABLE', 'matched': True, 'error': None}
+  {'input': 'aaaaaaaaaaaaaaaa', 'expected': 'INVALID_USERNAME', 'actual': 'AVAILABLE', 'matched': False, 'error': None}
+
+ AC-04 Requirement 4
+Agent: satisfied
+Final: violated
+  {'input': 'admin', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'ADMIN', 'expected': 'UNAVAILABLE', 'actual': 'AVAILABLE', 'matched': False, 'error': None}
+  {'input': 'JoHn', 'expected': 'UNAVAILABLE', 'actual': 'AVAILABLE', 'matched': False, 'error': None}
+
+ AC-05 Requirement 5
+Agent: satisfied
+Final: satisfied
+  {'input': 'admin', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'john', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'alice', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'bob', 'expected': 'AVAILABLE', 'actual': 'AVAILABLE', 'matched': True, 'error': None}
+
+ AC-06 Requirement 5
+Agent: satisfied
+Final: satisfied
+  {'input': 'admin', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'john', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'alice', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'bob', 'expected': 'AVAILABLE', 'actual': 'AVAILABLE', 'matched': True, 'error': None}
+
+ AC-07 Requirement 6
+Agent: satisfied
+Final: satisfied
+  {'input': 'admin', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'john', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+  {'input': 'alice', 'expected': 'UNAVAILABLE', 'actual': 'UNAVAILABLE', 'matched': True, 'error': None}
+
+ AC-08 Requirement 7
+Agent: satisfied
+Final: violated
+  {'input': 'ab', 'expected': 'INVALID_USERNAME', 'actual': 'INVALID_USERNAME', 'matched': True, 'error': None}
+  {'input': 'aaaaaaaaaaaaaaaa', 'expected': 'INVALID_USERNAME', 'actual': 'AVAILABLE', 'matched': False, 'error': None}
+  {'input': 123, 'expected': 'INVALID_USERNAME', 'actual': 'INVALID_USERNAME', 'matched': True, 'error': None}

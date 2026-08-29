@@ -337,6 +337,8 @@ def _validate_verification_response(
 
         if not (
             expected == VALID_RESULT
+            or expected == "AVAILABLE"
+            or expected == "UNAVAILABLE"
             or expected.startswith(
                 INVALID_RESULT_PREFIX
             )
@@ -344,8 +346,8 @@ def _validate_verification_response(
             raise ValueError(
                 f"Probe {index} has invalid expected "
                 f"value {expected!r}. "
-                "Expected must be VALID or "
-                "start with INVALID_."
+                "Expected must be VALID, AVAILABLE, "
+                "UNAVAILABLE, or start with INVALID_."
             )
 
         signature = (
@@ -750,6 +752,48 @@ def _repair_required_probes(
                 "input": "Pass word1!",
                 "expected": invalid_result,
             },
+        ]
+
+    # -------------------------------------------------
+    # CASE 07: USERNAME AVAILABILITY
+    # -------------------------------------------------
+
+    if (
+        "username" in description
+        and "at least 3 characters" in description
+    ):
+        return [
+            {"input": "abc", "expected": "AVAILABLE"},
+            {"input": "ab", "expected": invalid_result},
+        ]
+
+    if (
+        "username" in description
+        and "no more than 15 characters" in description
+    ):
+        return [
+            {"input": "a" * 15, "expected": "AVAILABLE"},
+            {"input": "a" * 16, "expected": invalid_result},
+        ]
+
+    if (
+        "case-insensitive" in description
+        and "already taken" in description
+    ):
+        return [
+            {"input": "admin", "expected": "UNAVAILABLE"},
+            {"input": "ADMIN", "expected": "UNAVAILABLE"},
+            {"input": "JoHn", "expected": "UNAVAILABLE"},
+        ]
+    
+    if (
+    "return invalid_username" in description
+    and "violates any validation requirement" in description
+):
+        return [
+            {"input": "ab", "expected": "INVALID_USERNAME"},
+            {"input": "a" * 16, "expected": "INVALID_USERNAME"},
+            {"input": 123, "expected": "INVALID_USERNAME"},
         ]
     
     # -------------------------------------------------
