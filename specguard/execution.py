@@ -107,11 +107,18 @@ def execute_verification_results(
             for probe in probe_results
         )
 
-        final_verdict = (
-             "violated"
-             if confirmed_violation
-             else "satisfied"
-        )
+        successful_executions = [
+            probe
+            for probe in probe_results
+            if probe["error"] is None
+        ]
+
+        if confirmed_violation:
+            final_verdict = "violated"
+        elif not successful_executions:
+            final_verdict = "inconclusive"
+        else:
+            final_verdict = "satisfied"
 
         executed_results.append(
             {

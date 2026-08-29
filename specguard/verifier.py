@@ -348,8 +348,8 @@ def _validate_verification_response(
             raise ValueError(
                 f"Probe {index} has invalid expected "
                 f"value {expected!r}. "
-                "Expected must be VALID, AVAILABLE, "
-                "UNAVAILABLE, APPROVED, DECLINED, "
+                "Expected must start with VALID, be AVAILABLE, "
+                "UNAVAILABLE, APPROVED, or DECLINED, "
                 "or start with INVALID_."
             )
         signature = (

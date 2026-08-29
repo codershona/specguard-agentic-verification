@@ -1,0 +1,4 @@
+Criterion: AC-TEST
+Final verdict: inconclusive
+Confirmed violation: False
+Probe: {'input': {'unexpected': 'input'}, 'expected': 'INVALID_USERNAME', 'actual': None, 'matched': False, 'error': "TypeError: validate_username() got an unexpected keyword argument 'unexpected'"}
