@@ -69,3 +69,34 @@ is currently represented as one acceptance criterion even though it contains two
 ### Decision / Learning
 
 Keep deterministic parsing as reliable infrastructure, but introduce an agent for semantic decomposition into truly atomic and testable acceptance criteria.
+
+
+
+## Iteration 2 - Semantic Requirement Decomposition
+
+### Goal
+Improve requirement decomposition using a local reasoning agent.
+
+### Changes
+- Added Ollama integration using `qwen3:4b`.
+- Added semantic requirement decomposition.
+- Added JSON-constrained model output.
+- Added validation and retry handling for malformed model responses.
+- Changed decomposition to process each requirement independently.
+- Assigned requirement numbers deterministically in Python to preserve traceability.
+- Added semantic decomposer unit test using a deterministic fake LLM.
+
+### Failures observed
+- Model initially returned reasoning text mixed with JSON.
+- Model returned malformed JSON fields.
+- Model generated an invalid requirement number.
+- Model over-decomposed numeric ranges.
+- Model duplicated requirements.
+- Requirement 3 was initially not split into independently testable start/end conditions.
+
+### Result
+Requirement 3 is now decomposed into:
+- Username must not begin with an underscore.
+- Username must not end with an underscore.
+
+All unit tests pass: 3/3.
