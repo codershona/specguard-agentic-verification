@@ -37,3 +37,35 @@ The implementation failed to enforce:
 Passing the repository's existing tests created false confidence.
 
 The next iteration should derive verification directly from the written requirement rather than assuming that existing tests represent the complete specification.
+
+
+## Iteration 1 — Structured Requirement Extraction
+
+### What we tried
+
+Added deterministic parsing and initial requirement decomposition.
+
+The workflow converts numbered statements in a requirement document into structured requirements and acceptance criteria.
+
+### Evidence
+
+- Requirement parser extracted: 6/6 numbered requirements
+- Parser unit tests: passed
+- Decomposer unit tests: passed
+
+### Limitation discovered
+
+The decomposition is syntactic rather than semantic.
+
+For example:
+
+`Not begin or end with an underscore.`
+
+is currently represented as one acceptance criterion even though it contains two independently verifiable behaviors:
+
+- username must not begin with `_`
+- username must not end with `_`
+
+### Decision / Learning
+
+Keep deterministic parsing as reliable infrastructure, but introduce an agent for semantic decomposition into truly atomic and testable acceptance criteria.
