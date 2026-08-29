@@ -336,7 +336,7 @@ def _validate_verification_response(
         expected = expected.strip()
 
         if not (
-            expected == VALID_RESULT
+            expected.startswith(VALID_RESULT)
             or expected == "AVAILABLE"
             or expected == "UNAVAILABLE"
             or expected == "APPROVED"
@@ -754,6 +754,138 @@ def _repair_required_probes(
                 "expected": invalid_result,
             },
         ]
+
+    # -------------------------------------------------
+    # CASE 09: COUPON VALIDATION
+    # -------------------------------------------------
+
+    if (
+        "coupon code must be a string" in description
+    ):
+        return [
+            {
+                "input": "SAVE1234",
+                "expected": "VALID_COUPON",
+            },
+            {
+                "input": 12345678,
+                "expected": "INVALID_COUPON",
+            },
+        ]
+
+    if (
+        "coupon code must contain exactly 8 characters"
+        in description
+    ):
+        return [
+            {
+                "input": "SAVE1234",
+                "expected": "VALID_COUPON",
+            },
+            {
+                "input": "SAVE123",
+                "expected": "INVALID_COUPON",
+            },
+            {
+                "input": "SAVE12345",
+                "expected": "INVALID_COUPON",
+            },
+        ]
+
+    if (
+        "uppercase ascii letters and digits" in description
+    ):
+        return [
+            {
+                "input": "SAVE1234",
+                "expected": "VALID_COUPON",
+            },
+            {
+                "input": "save1234",
+                "expected": "INVALID_COUPON",
+            },
+            {
+                "input": "Save1234",
+                "expected": "INVALID_COUPON",
+            },
+            {
+                "input": "SAVE12!4",
+                "expected": "INVALID_COUPON",
+            },
+        ]
+
+    if (
+        "start with the prefix save" in description
+    ):
+        return [
+            {
+                "input": "SAVE1234",
+                "expected": "VALID_COUPON",
+            },
+            {
+                "input": "TEST1234",
+                "expected": "INVALID_COUPON",
+            },
+            {
+                "input": "12345678",
+                "expected": "INVALID_COUPON",
+            },
+        ]
+
+    if (
+        "case-sensitive" in description
+        and "coupon" in description
+    ):
+        return [
+            {
+                "input": "SAVE1234",
+                "expected": "VALID_COUPON",
+            },
+            {
+                "input": "save1234",
+                "expected": "INVALID_COUPON",
+            },
+            {
+                "input": "Save1234",
+                "expected": "INVALID_COUPON",
+            },
+        ]
+
+    if (
+        "return valid_coupon" in description
+        and "all requirements" in description
+    ):
+        return [
+            {
+                "input": "SAVE1234",
+                "expected": "VALID_COUPON",
+            },
+            {
+                "input": "SAVE9999",
+                "expected": "VALID_COUPON",
+            },
+        ]
+
+    if (
+        "return invalid_coupon" in description
+        and "any requirement" in description
+    ):
+        return [
+            {
+                "input": "SAVE123",
+                "expected": "INVALID_COUPON",
+            },
+            {
+                "input": "save1234",
+                "expected": "INVALID_COUPON",
+            },
+            {
+                "input": "TEST1234",
+                "expected": "INVALID_COUPON",
+            },
+        ]
+
+
     # -------------------------------------------------
     # CASE 08: TRANSFER VALIDATION
     # -------------------------------------------------

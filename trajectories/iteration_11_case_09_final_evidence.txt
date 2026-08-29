@@ -1,0 +1,48 @@
+
+ AC-01 Requirement 1
+Agent: satisfied
+Final: satisfied
+  {'input': 'SAVE1234', 'expected': 'VALID_COUPON', 'actual': 'VALID_COUPON', 'matched': True, 'error': None}
+  {'input': 12345678, 'expected': 'INVALID_COUPON', 'actual': 'INVALID_COUPON', 'matched': True, 'error': None}
+
+ AC-02 Requirement 2
+Agent: satisfied
+Final: satisfied
+  {'input': 'SAVE1234', 'expected': 'VALID_COUPON', 'actual': 'VALID_COUPON', 'matched': True, 'error': None}
+  {'input': 'SAVE123', 'expected': 'INVALID_COUPON', 'actual': 'INVALID_COUPON', 'matched': True, 'error': None}
+  {'input': 'SAVE12345', 'expected': 'INVALID_COUPON', 'actual': 'INVALID_COUPON', 'matched': True, 'error': None}
+
+ AC-03 Requirement 3
+Agent: satisfied
+Final: violated
+  {'input': 'SAVE1234', 'expected': 'VALID_COUPON', 'actual': 'VALID_COUPON', 'matched': True, 'error': None}
+  {'input': 'save1234', 'expected': 'INVALID_COUPON', 'actual': 'VALID_COUPON', 'matched': False, 'error': None}
+  {'input': 'Save1234', 'expected': 'INVALID_COUPON', 'actual': 'VALID_COUPON', 'matched': False, 'error': None}
+  {'input': 'SAVE12!4', 'expected': 'INVALID_COUPON', 'actual': 'INVALID_COUPON', 'matched': True, 'error': None}
+
+ AC-04 Requirement 4
+Agent: satisfied
+Final: violated
+  {'input': 'SAVE1234', 'expected': 'VALID_COUPON', 'actual': 'VALID_COUPON', 'matched': True, 'error': None}
+  {'input': 'TEST1234', 'expected': 'INVALID_COUPON', 'actual': 'VALID_COUPON', 'matched': False, 'error': None}
+  {'input': '12345678', 'expected': 'INVALID_COUPON', 'actual': 'VALID_COUPON', 'matched': False, 'error': None}
+
+ AC-05 Requirement 5
+Agent: satisfied
+Final: violated
+  {'input': 'SAVE1234', 'expected': 'VALID_COUPON', 'actual': 'VALID_COUPON', 'matched': True, 'error': None}
+  {'input': 'save1234', 'expected': 'INVALID_COUPON', 'actual': 'VALID_COUPON', 'matched': False, 'error': None}
+  {'input': 'Save1234', 'expected': 'INVALID_COUPON', 'actual': 'VALID_COUPON', 'matched': False, 'error': None}
+
+ AC-06 Requirement 6
+Agent: satisfied
+Final: satisfied
+  {'input': 'SAVE1234', 'expected': 'VALID_COUPON', 'actual': 'VALID_COUPON', 'matched': True, 'error': None}
+  {'input': 'SAVE9999', 'expected': 'VALID_COUPON', 'actual': 'VALID_COUPON', 'matched': True, 'error': None}
+
+ AC-07 Requirement 7
+Agent: satisfied
+Final: violated
+  {'input': 'SAVE123', 'expected': 'INVALID_COUPON', 'actual': 'INVALID_COUPON', 'matched': True, 'error': None}
+  {'input': 'save1234', 'expected': 'INVALID_COUPON', 'actual': 'VALID_COUPON', 'matched': False, 'error': None}
+  {'input': 'TEST1234', 'expected': 'INVALID_COUPON', 'actual': 'VALID_COUPON', 'matched': False, 'error': None}
