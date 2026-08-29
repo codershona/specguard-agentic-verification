@@ -229,3 +229,195 @@ existing developer tests.
 
 The next step is to evaluate SpecGuard across additional cases to determine
 whether this performance generalizes beyond Case 01.
+
+
+
+
+cat >> CHANGELOG.md <<'EOF'
+
+## Iteration 5 — Email Probe Generalization
+
+### Goal
+
+Extend verification beyond username validation and improve probe generation for email requirements.
+
+### Changes
+
+- Added email-specific probe generation.
+- Improved invalid-input handling.
+- Added Case 03 evaluation.
+- Captured final execution evidence.
+
+### Result
+
+Case 03 was evaluated against an independent evaluator and SpecGuard detected the requirement defects exposed by the benchmark.
+
+---
+
+## Iteration 6 — Typed Input Verification
+
+### Goal
+
+Verify requirements involving input types rather than only string values.
+
+### Changes
+
+- Added typed probe generation.
+- Added Case 04 evaluation.
+- Added verification of invalid input types.
+- Preserved executable evidence for each probe.
+
+### Result
+
+Case 04 was successfully evaluated and requirement defects were detected through execution-grounded verification.
+
+---
+
+## Iteration 7 — Multi-Argument Verification
+
+### Goal
+
+Support requirements where behavior depends on multiple function arguments.
+
+### Changes
+
+- Added structured multi-argument probe inputs.
+- Extended execution to pass dictionary-based arguments to target functions.
+- Added Case 05 evaluation.
+- Added evidence for multi-argument verification.
+
+### Result
+
+SpecGuard successfully verified multi-argument requirements and identified missing behaviors in the implementation.
+
+---
+
+## Iteration 8 — Numeric Probe Generalization
+
+### Goal
+
+Improve verification of numeric boundaries and range-based requirements.
+
+### Changes
+
+- Generalized numeric probe generation.
+- Added boundary-oriented probes.
+- Added Case 06 evaluation.
+- Preserved execution evidence for numeric requirements.
+
+### Result
+
+Case 06 demonstrated that generated probes can expose requirement gaps beyond the repository's developer tests.
+
+---
+
+## Iteration 9 — Availability Outcomes
+
+### Goal
+
+Support requirements whose expected outcomes use availability-specific result values.
+
+### Changes
+
+- Added support for `AVAILABLE`.
+- Added support for `UNAVAILABLE`.
+- Updated verification-response validation.
+- Added Case 07 evaluation.
+
+### Result
+
+The verification pipeline successfully handled availability-specific outcomes and detected the missing requirement behaviors in Case 07.
+
+---
+
+## Iteration 10 — Transfer Verification
+
+### Goal
+
+Generalize verification for transaction and transfer-style requirements.
+
+### Changes
+
+- Added transfer-specific probe generation.
+- Added multi-argument transfer probes.
+- Added support for approval and invalid-transfer outcomes.
+- Added Case 08 evaluation.
+- Added final execution evidence.
+
+### Result
+
+Case 08 exposed requirement gaps involving amount/balance relationships and invalid input types.
+
+---
+
+## Iteration 11 — Coupon Verification
+
+### Goal
+
+Extend verification to structured coupon validation requirements.
+
+### Changes
+
+- Added coupon-specific probe generation.
+- Added support for coupon validity outcomes.
+- Generalized expected-result validation.
+- Added Case 09 evaluation.
+- Added final execution evidence.
+
+### Result
+
+Case 09 demonstrated that executable probes could expose missing constraints involving coupon format, case sensitivity, prefix requirements, and related validation behavior.
+
+---
+
+## Iteration 12 — Transaction Verification and Case 10
+
+### Goal
+
+Generalize transaction-style verification for withdrawal requirements.
+
+### Changes
+
+- Added withdrawal-specific verification behavior.
+- Generalized invalid-result handling.
+- Added multi-argument withdrawal probes.
+- Added Case 10 evaluation.
+- Added final execution evidence.
+
+### Result
+
+Case 10 exposed implementation gaps involving withdrawal limits, balance constraints, and boolean input handling.
+
+---
+
+## Iteration 13 — Execution Error Handling
+
+### Goal
+
+Prevent execution failures from being incorrectly classified as requirement violations or successful verification.
+
+### Changes
+
+- Added explicit detection of successful probe executions.
+- Added `inconclusive` final verdict handling.
+- Execution errors no longer count as confirmed requirement violations.
+- Added a regression test for all-error execution scenarios.
+- Added execution-error evidence.
+- Added aggregate evaluation metrics.
+
+### Result
+
+The execution layer now distinguishes three states:
+
+- `violated` — executable evidence confirms a mismatch.
+- `satisfied` — executable evidence provides successful verification.
+- `inconclusive` — execution failed to provide usable evidence.
+
+The project test suite passes all six tests.
+
+### Decision / Learning
+
+Execution errors are evidence that verification could not be completed, not evidence that the requirement itself was violated.
+
+This makes the final verdict more conservative and evidence-driven.
+EOF
