@@ -753,6 +753,123 @@ def _repair_required_probes(
         ]
     
     # -------------------------------------------------
+    # CASE 06: DISCOUNT VALIDATION
+    # -------------------------------------------------
+
+    if (
+        "discount" in description
+        and "number" in description
+        and "boolean" not in description
+    ):
+        return [
+            {
+                "input": 50,
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": 25.5,
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": "50",
+                "expected": invalid_result,
+            },
+        ]
+
+    if (
+        "discount" in description
+        and "at least 0" in description
+    ):
+        return [
+            {
+                "input": 0,
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": -1,
+                "expected": invalid_result,
+            },
+            {
+                "input": -0.1,
+                "expected": invalid_result,
+            },
+        ]
+
+    if (
+        "discount" in description
+        and "not exceed" in description
+        and "100" in description
+    ):
+        return [
+            {
+                "input": 100,
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": 101,
+                "expected": invalid_result,
+            },
+        ]
+
+    if (
+        "boolean values must not be accepted as numbers"
+        in description
+    ):
+        return [
+            {
+                "input": True,
+                "expected": invalid_result,
+            },
+            {
+                "input": False,
+                "expected": invalid_result,
+            },
+            {
+                "input": 50,
+                "expected": VALID_RESULT,
+            },
+        ]
+
+    if (
+        "return valid" in description
+        and "all requirements" in description
+        and invalid_result == "INVALID_DISCOUNT"
+    ):
+        return [
+            {
+                "input": 0,
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": 50,
+                "expected": VALID_RESULT,
+            },
+            {
+                "input": 100,
+                "expected": VALID_RESULT,
+            },
+        ]
+
+    if (
+        "return invalid_discount" in description
+        and "any requirement" in description
+    ):
+        return [
+            {
+                "input": -1,
+                "expected": invalid_result,
+            },
+            {
+                "input": 101,
+                "expected": invalid_result,
+            },
+            {
+                "input": True,
+                "expected": invalid_result,
+            },
+        ]
+    
+    # -------------------------------------------------
     # CASE 05: DATE RANGE VALIDATION
     # -------------------------------------------------
 
@@ -846,7 +963,14 @@ def _repair_required_probes(
             },
         ]
 
-    if "boolean" in description:
+    if (
+        "boolean" in description
+        and (
+            "start day" in description
+            or "end day" in description
+            or "date range" in description
+        )
+      ):
         return [
             {
                 "input": {
@@ -874,6 +998,11 @@ def _repair_required_probes(
     if (
         "return valid" in description
         and "all requirements" in description
+        and (
+            "date" in description
+            or "start day" in description
+            or "end day" in description
+        )
     ):
         return [
             {

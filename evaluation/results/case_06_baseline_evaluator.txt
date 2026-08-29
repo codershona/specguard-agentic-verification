@@ -1,0 +1,54 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/falguniislam/Documents/specguard-agentic-verification/.venv/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/falguniislam/Documents/specguard-agentic-verification
+configfile: pytest.ini
+collecting ... collected 10 items
+
+evaluator_test.py::test_zero_is_valid PASSED                             [ 10%]
+evaluator_test.py::test_integer_discount_is_valid PASSED                 [ 20%]
+evaluator_test.py::test_float_discount_is_valid PASSED                   [ 30%]
+evaluator_test.py::test_hundred_is_valid PASSED                          [ 40%]
+evaluator_test.py::test_negative_integer_is_invalid PASSED               [ 50%]
+evaluator_test.py::test_negative_float_is_invalid PASSED                 [ 60%]
+evaluator_test.py::test_above_hundred_is_invalid FAILED                  [ 70%]
+evaluator_test.py::test_string_is_invalid PASSED                         [ 80%]
+evaluator_test.py::test_true_is_invalid FAILED                           [ 90%]
+evaluator_test.py::test_false_is_invalid FAILED                          [100%]
+
+=================================== FAILURES ===================================
+________________________ test_above_hundred_is_invalid _________________________
+
+    def test_above_hundred_is_invalid():
+>       assert validate_discount(101) == "INVALID_DISCOUNT"
+E       AssertionError: assert 'VALID' == 'INVALID_DISCOUNT'
+E         
+E         - INVALID_DISCOUNT
+E         + VALID
+
+evaluator_test.py:29: AssertionError
+_____________________________ test_true_is_invalid _____________________________
+
+    def test_true_is_invalid():
+>       assert validate_discount(True) == "INVALID_DISCOUNT"
+E       AssertionError: assert 'VALID' == 'INVALID_DISCOUNT'
+E         
+E         - INVALID_DISCOUNT
+E         + VALID
+
+evaluator_test.py:37: AssertionError
+____________________________ test_false_is_invalid _____________________________
+
+    def test_false_is_invalid():
+>       assert validate_discount(False) == "INVALID_DISCOUNT"
+E       AssertionError: assert 'VALID' == 'INVALID_DISCOUNT'
+E         
+E         - INVALID_DISCOUNT
+E         + VALID
+
+evaluator_test.py:41: AssertionError
+=========================== short test summary info ============================
+FAILED evaluator_test.py::test_above_hundred_is_invalid - AssertionError: ass...
+FAILED evaluator_test.py::test_true_is_invalid - AssertionError: assert 'VALI...
+FAILED evaluator_test.py::test_false_is_invalid - AssertionError: assert 'VAL...
+========================= 3 failed, 7 passed in 0.02s ==========================

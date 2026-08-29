@@ -1,0 +1,41 @@
+
+ AC-01 Requirement 1
+Agent: satisfied
+Final: satisfied
+  {'input': 50, 'expected': 'VALID', 'actual': 'VALID', 'matched': True, 'error': None}
+  {'input': 25.5, 'expected': 'VALID', 'actual': 'VALID', 'matched': True, 'error': None}
+  {'input': '50', 'expected': 'INVALID_DISCOUNT', 'actual': 'INVALID_DISCOUNT', 'matched': True, 'error': None}
+
+ AC-02 Requirement 2
+Agent: satisfied
+Final: satisfied
+  {'input': 0, 'expected': 'VALID', 'actual': 'VALID', 'matched': True, 'error': None}
+  {'input': -1, 'expected': 'INVALID_DISCOUNT', 'actual': 'INVALID_DISCOUNT', 'matched': True, 'error': None}
+  {'input': -0.1, 'expected': 'INVALID_DISCOUNT', 'actual': 'INVALID_DISCOUNT', 'matched': True, 'error': None}
+
+ AC-03 Requirement 3
+Agent: satisfied
+Final: violated
+  {'input': 100, 'expected': 'VALID', 'actual': 'VALID', 'matched': True, 'error': None}
+  {'input': 101, 'expected': 'INVALID_DISCOUNT', 'actual': 'VALID', 'matched': False, 'error': None}
+
+ AC-04 Requirement 4
+Agent: satisfied
+Final: violated
+  {'input': True, 'expected': 'INVALID_DISCOUNT', 'actual': 'VALID', 'matched': False, 'error': None}
+  {'input': False, 'expected': 'INVALID_DISCOUNT', 'actual': 'VALID', 'matched': False, 'error': None}
+  {'input': 50, 'expected': 'VALID', 'actual': 'VALID', 'matched': True, 'error': None}
+
+ AC-05 Requirement 5
+Agent: satisfied
+Final: satisfied
+  {'input': 0, 'expected': 'VALID', 'actual': 'VALID', 'matched': True, 'error': None}
+  {'input': 50, 'expected': 'VALID', 'actual': 'VALID', 'matched': True, 'error': None}
+  {'input': 100, 'expected': 'VALID', 'actual': 'VALID', 'matched': True, 'error': None}
+
+ AC-06 Requirement 6
+Agent: satisfied
+Final: violated
+  {'input': -1, 'expected': 'INVALID_DISCOUNT', 'actual': 'INVALID_DISCOUNT', 'matched': True, 'error': None}
+  {'input': 101, 'expected': 'INVALID_DISCOUNT', 'actual': 'VALID', 'matched': False, 'error': None}
+  {'input': True, 'expected': 'INVALID_DISCOUNT', 'actual': 'VALID', 'matched': False, 'error': None}
