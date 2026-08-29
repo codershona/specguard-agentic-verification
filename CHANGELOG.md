@@ -233,24 +233,50 @@ whether this performance generalizes beyond Case 01.
 
 
 
-cat >> CHANGELOG.md <<'EOF'
 
 ## Iteration 5 — Email Probe Generalization
 
 ### Goal
 
-Extend verification beyond username validation and improve probe generation for email requirements.
+Test whether verification behavior generalized from username/password requirements to a different validation domain.
 
-### Changes
+### What we tried
 
-- Added email-specific probe generation.
-- Improved invalid-input handling.
-- Added Case 03 evaluation.
-- Captured final execution evidence.
+Extended probe generation and deterministic repair for email-validation requirements.
 
-### Result
+### Failure observed
 
-Case 03 was evaluated against an independent evaluator and SpecGuard detected the requirement defects exposed by the benchmark.
+Password-oriented repair behavior leaked into the email case, demonstrating that case-specific repair logic could generate irrelevant probes when applied too broadly.
+
+### Evidence
+
+Case 03 baseline:
+
+- Developer tests: 2/2 passed
+- Independent evaluator: 6/9 passed (66.7%)
+- Unique requirement defects: 3
+
+The missing behaviors covered:
+
+- domain-dot validation
+- space rejection
+- non-ASCII rejection
+
+After repairing the generalization problem, SpecGuard detected all 3 unique defects.
+
+Evidence:
+
+`trajectories/iteration_05_case_03_generalization_failure.txt`
+
+`trajectories/iteration_05_case_03_final_evidence.txt`
+
+### Decision / Learning
+
+Unscoped case-specific repair heuristics do not generalize safely.
+
+Repair behavior should be constrained by the current requirement semantics rather than inherited from an unrelated validation domain.
+
+This experiment led to removing the leaking password-oriented behavior from the email verification path and replacing it with requirement-appropriate repair logic.
 
 ---
 
@@ -258,18 +284,44 @@ Case 03 was evaluated against an independent evaluator and SpecGuard detected th
 
 ### Goal
 
-Verify requirements involving input types rather than only string values.
+Extend verification beyond string-only inputs.
 
-### Changes
+### What we tried
 
-- Added typed probe generation.
-- Added Case 04 evaluation.
-- Added verification of invalid input types.
-- Preserved executable evidence for each probe.
+Preserved JSON primitive types in generated probes and added typed-input verification for quantity requirements.
 
-### Result
+### Failure observed
 
-Case 04 was successfully evaluated and requirement defects were detected through execution-grounded verification.
+Early response handling treated values such as `0` and `False` as missing because they are falsey in Python.
+
+This prevented valid typed probes from being represented correctly.
+
+### Evidence
+
+Case 04 baseline:
+
+- Developer tests: 2/2 passed
+- Independent evaluator: 7/9 passed (77.8%)
+- Unique requirement defects: 2
+
+Missing behaviors:
+
+- values above the maximum boundary
+- boolean-input rejection
+
+After typed-input handling was corrected, SpecGuard detected both unique defects.
+
+Evidence:
+
+`trajectories/iteration_06_case_04_typed_input_failure.txt`
+
+`trajectories/iteration_06_case_04_final_evidence.txt`
+
+### Decision / Learning
+
+Probe validation must preserve the distinction between a missing value and a valid falsey primitive.
+
+Agent-generated structured data requires deterministic schema handling before execution.
 
 ---
 
@@ -277,18 +329,42 @@ Case 04 was successfully evaluated and requirement defects were detected through
 
 ### Goal
 
-Support requirements where behavior depends on multiple function arguments.
+Support requirements whose behavior depends on multiple function arguments.
 
-### Changes
+### What we tried
 
-- Added structured multi-argument probe inputs.
-- Extended execution to pass dictionary-based arguments to target functions.
-- Added Case 05 evaluation.
-- Added evidence for multi-argument verification.
+Added dictionary-based probe inputs and execution through keyword arguments.
 
-### Result
+### Failure observed
 
-SpecGuard successfully verified multi-argument requirements and identified missing behaviors in the implementation.
+Initial multi-argument verification was incomplete because the existing execution path was designed primarily around single-input functions.
+
+### Evidence
+
+Case 05 baseline:
+
+- Developer tests: 2/2 passed
+- Independent evaluator: 8/10 passed (80.0%)
+- Unique requirement defects: 2
+
+Missing behaviors:
+
+- end date above the allowed maximum
+- boolean-input rejection
+
+After multi-argument support was added, SpecGuard detected both unique defects.
+
+Evidence:
+
+`trajectories/iteration_07_case_05_partial_multi_argument_evidence.txt`
+
+`trajectories/iteration_07_case_05_final_evidence.txt`
+
+### Decision / Learning
+
+Executable verification needs to model the target function's invocation structure, not only the semantic requirement.
+
+Multi-argument requirements therefore require structured probes that preserve all required parameters.
 
 ---
 
@@ -296,18 +372,36 @@ SpecGuard successfully verified multi-argument requirements and identified missi
 
 ### Goal
 
-Improve verification of numeric boundaries and range-based requirements.
+Improve reusable verification of numeric boundaries and invalid numeric types.
 
-### Changes
+### What we tried
 
-- Generalized numeric probe generation.
-- Added boundary-oriented probes.
-- Added Case 06 evaluation.
-- Preserved execution evidence for numeric requirements.
+Generalized numeric probe generation and boundary-oriented deterministic repairs.
 
-### Result
+### Evidence
 
-Case 06 demonstrated that generated probes can expose requirement gaps beyond the repository's developer tests.
+Case 06 baseline:
+
+- Developer tests: 2/2 passed
+- Independent evaluator: 7/10 passed (70.0%)
+- Unique requirement defects: 2
+
+Missing behaviors:
+
+- discount above the maximum value
+- boolean-input rejection
+
+SpecGuard detected both unique defect dimensions.
+
+Evidence:
+
+`trajectories/iteration_08_case_06_final_evidence.txt`
+
+### Decision / Learning
+
+Numeric verification benefits from deterministic boundary probes around requirement thresholds.
+
+The strongest workflow combines agent interpretation of the requirement with deterministic generation of high-value boundary evidence.
 
 ---
 
@@ -315,18 +409,36 @@ Case 06 demonstrated that generated probes can expose requirement gaps beyond th
 
 ### Goal
 
-Support requirements whose expected outcomes use availability-specific result values.
+Generalize expected-result handling beyond `VALID` and `INVALID_*` responses.
 
-### Changes
+### What we tried
 
-- Added support for `AVAILABLE`.
-- Added support for `UNAVAILABLE`.
-- Updated verification-response validation.
-- Added Case 07 evaluation.
+Added support for domain-specific outcomes including `AVAILABLE` and `UNAVAILABLE`.
 
-### Result
+### Evidence
 
-The verification pipeline successfully handled availability-specific outcomes and detected the missing requirement behaviors in Case 07.
+Case 07 baseline:
+
+- Developer tests: 2/2 passed
+- Independent evaluator: 7/10 passed (70.0%)
+- Unique requirement defects: 2
+
+Missing behaviors:
+
+- maximum username length
+- case-insensitive comparison against taken usernames
+
+SpecGuard detected both unique defect dimensions.
+
+Evidence:
+
+`trajectories/iteration_09_case_07_final_evidence.txt`
+
+### Decision / Learning
+
+A verification framework cannot assume that all specifications use generic valid/invalid result labels.
+
+Expected-result validation must accommodate the vocabulary defined by the target specification.
 
 ---
 
@@ -334,19 +446,44 @@ The verification pipeline successfully handled availability-specific outcomes an
 
 ### Goal
 
-Generalize verification for transaction and transfer-style requirements.
+Stress-test multi-argument verification using transaction relationships.
 
-### Changes
+### What we tried
 
-- Added transfer-specific probe generation.
-- Added multi-argument transfer probes.
-- Added support for approval and invalid-transfer outcomes.
-- Added Case 08 evaluation.
-- Added final execution evidence.
+Extended transaction-oriented probes for amount and balance relationships.
 
-### Result
+### Failure observed
 
-Case 08 exposed requirement gaps involving amount/balance relationships and invalid input types.
+Some generated probes supplied only one argument to a multi-argument function.
+
+Those probes produced execution errors and revealed that execution failure could be confused with evidence of a requirement violation.
+
+### Evidence
+
+Case 08 baseline:
+
+- Developer tests: 2/2 passed
+- Independent evaluator: 7/10 passed (70.0%)
+- Unique requirement defects: 2
+
+Missing behaviors:
+
+- amount exceeding balance
+- boolean-input rejection
+
+After strengthening multi-argument probes and execution handling, SpecGuard detected both unique defect dimensions.
+
+Evidence:
+
+`trajectories/iteration_10_case_08_final_evidence.txt`
+
+### Decision / Learning
+
+An execution error is not evidence that an implementation violates a requirement.
+
+Only successfully executed probes that produce mismatched behavior should confirm a violation.
+
+This failure directly motivated the more conservative execution semantics finalized in Iteration 13.
 
 ---
 
@@ -354,70 +491,151 @@ Case 08 exposed requirement gaps involving amount/balance relationships and inva
 
 ### Goal
 
-Extend verification to structured coupon validation requirements.
+Test verification against structured string constraints with domain-specific success values.
 
-### Changes
+### What we tried
 
-- Added coupon-specific probe generation.
-- Added support for coupon validity outcomes.
-- Generalized expected-result validation.
-- Added Case 09 evaluation.
-- Added final execution evidence.
+Extended probe generation for length, character-set, case-sensitivity, and prefix requirements.
 
-### Result
+### Failure observed
 
-Case 09 demonstrated that executable probes could expose missing constraints involving coupon format, case sensitivity, prefix requirements, and related validation behavior.
+The verifier initially generated the generic expected result `VALID`, while the specification required `VALID_COUPON`.
+
+Expected-result validation was therefore generalized without treating the agent's original label as authoritative.
+
+### Evidence
+
+Case 09 baseline:
+
+- Developer tests: 2/2 passed
+- Independent evaluator: 6/10 passed (60.0%)
+- Unique requirement defects: 2
+
+Missing defect dimensions:
+
+- uppercase ASCII requirement
+- required `SAVE` prefix
+
+SpecGuard detected both unique defect dimensions.
+
+Evidence:
+
+`trajectories/iteration_11_case_09_final_evidence.txt`
+
+### Decision / Learning
+
+Agent-generated expected labels need deterministic validation against the specification's output vocabulary.
+
+Semantic correctness matters more than accepting the model's first textual representation.
 
 ---
 
-## Iteration 12 — Transaction Verification and Case 10
+## Iteration 12 — Withdrawal Verification
 
 ### Goal
 
-Generalize transaction-style verification for withdrawal requirements.
+Verify that transaction-oriented logic generalized from transfer requirements to withdrawal requirements.
 
-### Changes
+### What we tried
 
-- Added withdrawal-specific verification behavior.
-- Generalized invalid-result handling.
-- Added multi-argument withdrawal probes.
-- Added Case 10 evaluation.
-- Added final execution evidence.
+Generalized transaction verification, invalid-result handling, and multi-argument withdrawal probes.
 
-### Result
+### Evidence
 
-Case 10 exposed implementation gaps involving withdrawal limits, balance constraints, and boolean input handling.
+Case 10 baseline:
+
+- Developer tests: 2/2 passed
+- Independent evaluator: 8/10 passed (80.0%)
+- Unique requirement defects: 2
+
+Missing behaviors:
+
+- amount exceeding available balance
+- boolean balance handling
+
+SpecGuard detected both unique defect dimensions.
+
+Evidence:
+
+`trajectories/iteration_12_case_10_final_evidence.txt`
+
+### Decision / Learning
+
+Transaction verification could be reused across related domains once expected-result handling and multi-argument execution were separated from case-specific result names.
 
 ---
 
-## Iteration 13 — Execution Error Handling
+## Iteration 13 — Execution Error Handling and Final Evaluation
 
 ### Goal
 
 Prevent execution failures from being incorrectly classified as requirement violations or successful verification.
 
+### What we tried
+
+Changed final-verdict calculation to distinguish executable mismatches from probe execution failures.
+
 ### Changes
 
-- Added explicit detection of successful probe executions.
-- Added `inconclusive` final verdict handling.
-- Execution errors no longer count as confirmed requirement violations.
-- Added a regression test for all-error execution scenarios.
-- Added execution-error evidence.
-- Added aggregate evaluation metrics.
+- Execution errors no longer count as confirmed violations.
+- Added detection of whether any probe executed successfully.
+- Added an explicit `inconclusive` verdict when all probes fail to execute.
+- Added a regression test for the all-error scenario.
+- Re-ran the complete benchmark.
 
-### Result
+### Evidence
 
-The execution layer now distinguishes three states:
+A deliberately invalid invocation produced a `TypeError`.
 
-- `violated` — executable evidence confirms a mismatch.
-- `satisfied` — executable evidence provides successful verification.
-- `inconclusive` — execution failed to provide usable evidence.
+Rather than reporting `violated`, SpecGuard now reports:
 
-The project test suite passes all six tests.
+`inconclusive`
+
+with:
+
+`confirmed_violation = False`
+
+Evidence:
+
+`trajectories/iteration_13_execution_inconclusive_evidence.txt`
+
+Final aggregate benchmark:
+
+- Evaluation cases: 10
+- Independent evaluator tests: 97
+- Baseline evaluator tests passed: 64/97 (66.0%)
+- Failing evaluator scenarios: 33
+- Unique requirement defects: 26
+- Unique defects detected by SpecGuard: 26/26
+- Primary metric — unique-defect recall: 100%
+- Core project tests: 6/6 passed
+
+Aggregate evidence:
+
+`evaluation/results/aggregate_metrics.md`
 
 ### Decision / Learning
 
-Execution errors are evidence that verification could not be completed, not evidence that the requirement itself was violated.
+Execution errors mean that verification could not establish usable evidence; they do not prove either satisfaction or violation.
 
-This makes the final verdict more conservative and evidence-driven.
-EOF
+The final system therefore uses three evidence-grounded outcomes:
+
+- `satisfied`
+- `violated`
+- `inconclusive`
+
+## Main Failure Mode and Hot Take
+
+### Main Failure Mode
+
+The most important recurring failure mode was trusting agent-generated probes or labels before verifying that they were semantically aligned, structurally valid, and executable.
+
+Examples included case-specific repair leakage, falsey typed inputs, incomplete multi-argument probes, and incorrect expected-result labels.
+
+These failures led to the hybrid architecture used in the final system: agent reasoning proposes verification actions, while deterministic validation, repair, and execution determine whether those actions provide usable evidence.
+
+### Hot Take
+
+**The most reliable role for an agent in software verification is not to declare whether the code is correct. It is to propose high-value tests whose claims can be checked independently.**
+
+SpecGuard improved when the agent became less authoritative: semantic reasoning remained useful for generating verification probes, but deterministic validation and executable evidence became the source of truth.

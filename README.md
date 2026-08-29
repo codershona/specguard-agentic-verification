@@ -56,6 +56,26 @@ This demonstrates the central principle of the project:
 
 > Passing developer tests is not sufficient evidence of full requirement satisfaction.
 
+## Problem, User & Value
+
+### Who has this problem?
+
+Software engineers, technical leads, and reviewers need to determine whether an implementation actually satisfies its written requirements before a change is accepted or released.
+
+### What is the bottleneck?
+
+Developer-written tests often validate the behaviors the developer already considered. A test suite can therefore pass while important requirements, boundary conditions, invalid inputs, or interactions between constraints remain untested.
+
+Manually translating every written requirement into comprehensive verification cases is time-consuming and inconsistent, especially as specifications become larger and more complex.
+
+### Why is solving it valuable?
+
+SpecGuard provides an independent verification workflow that starts from the written requirement rather than from the existing test suite.
+
+It decomposes the specification into acceptance criteria, uses an agent to generate targeted verification probes, validates and repairs those probes deterministically, executes them against the implementation, and produces evidence-grounded verdicts.
+
+The goal is not to replace developer tests or human review. It is to provide an additional verification layer that can expose requirement gaps before they reach production.
+
 ## Quick Start
 
 Create and activate a virtual environment:
@@ -154,6 +174,20 @@ This distinction prevents execution errors from being incorrectly interpreted as
 ## Evaluation
 
 SpecGuard was evaluated across 10 independent requirement-validation cases.
+
+### Primary Metric
+
+The primary evaluation metric is **unique-defect recall**: the percentage of distinct requirement defects in the benchmark that SpecGuard successfully exposes through executable verification evidence.
+
+This metric was selected because the intended user needs SpecGuard to discover requirement behaviors that existing developer tests failed to cover.
+
+Across the benchmark:
+
+- Unique requirement defects: **26**
+- Unique defects detected by SpecGuard: **26**
+- Unique-defect recall: **100%**
+
+The baseline evaluator pass rate (**64/97, or 66.0%**) is reported separately to quantify how much requirement behavior the original implementations missed. Baseline pass rate and SpecGuard defect recall measure different aspects of the evaluation and are therefore not treated as directly interchangeable metrics.
 
 ### Baseline Evaluator Results
 
